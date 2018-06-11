@@ -84,6 +84,7 @@ celerybeat-schedule
 env/
 venv/
 ENV/
+setup.bat
 
 # Spyder project settings
 .spyderproject
@@ -97,3 +98,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pylint
+.pylint.d/
