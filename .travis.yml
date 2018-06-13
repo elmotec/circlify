@@ -1,0 +1,20 @@
+language: python
+
+# When adding a version here, remember to change it in setup.py
+python:
+    - "2.7"
+    - "3.3"
+    - "3.4"
+    - "3.5"
+    - "3.6"
+
+install:
+    - python setup.py --quiet install
+    - pip --quiet install coverage python-coveralls
+
+script:
+    - python setup.py --quiet test
+
+after_success:
+    - coverage run --source circlify tests.py
+    - coveralls

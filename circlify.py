@@ -6,7 +6,8 @@
 Circles are first arranged via a version of A1.0 by Huang et al (see
 https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then
 enclosed in a circle created around them using Matoušek-Sharir-Welzl algorithm
-used in d3js (see https://beta.observablehq.com/@mbostock/miniball and
+used in d3js (see https://beta.observablehq.com/@mbostock/miniball,
+http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf, and
 https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
 
 """
