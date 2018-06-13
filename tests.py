@@ -6,7 +6,7 @@
 
 import unittest
 
-import circlify as circ
+from circlify import Circle, circlify, bubbles
 
 
 # Set this variable to True to get a display of the layout (req matlplotlib)
@@ -16,41 +16,35 @@ display_layout = False
 class SpecialCases(unittest.TestCase):
     """Hedge cases and obvious answers handling."""
 
-    def notest_empty_input(self):
+    def test_empty_input(self):
         """What do we do when the output is empty?"""
-        actual = circ.circlify({})
-        self.assertEqual(actual, {})
+        actual = circlify([])
+        self.assertEqual(actual, [])
 
-    def notest_single_value(self):
+    def test_single_value(self):
         """If there is only one value, it should occupy the whole circle."""
-        actual = circ.circlify({'a': 2.0})
-        expected = {'a': circ.Circle(0.0, 0.0, 1.0)}
+        actual = circlify([2.0])
+        expected = [Circle(0.0, 0.0, 1.0)]
         self.assertEqual(actual, expected)
 
-    def notest_two_equal_values(self):
+    def test_two_equal_values(self):
         """Two equal circle cases is also trivial."""
         # Force scaling to .5 so that each circle radius is brought to 0.5.
-        actual = circ.circlify({'a': 1.0, 'b': 1.0})
-        expected = {'a': circ.Circle(0.5, 0.0, 0.5),
-                    'b': circ.Circle(-0.5, 0.0, 0.5)}
+        actual = circlify([1.0, 1.0])
+        expected = [Circle(0.5, 0.0, 0.5), Circle(-0.5, 0.0, 0.5)]
         self.assertEqual(actual, expected)
-
-    def notest_bubbles(self):
-        """Test display of bubbles"""
-        circ.bubbles({'unit': circ.Circle(0, 0, 1)})
-        self.assertTrue(True)
 
 
 class TestCaseWithDisplay(unittest.TestCase):
     """Display the result of the placement of the circle."""
 
-    def display(self, actual):
+    def display(self, circles, labels):
         """Forwards call to circlify.bubbles()."""
         try:
             if display_layout:
-                circ.bubbles(actual)
+                bubbles(circles, labels)
         except AttributeError as err:
-            circ.log.error("%s. %s", err, "Did you install matplotlib?")
+            log.error("%s. %s", err, "Did you install matplotlib?")
 
 
 class PrimeSerieTestCase(TestCaseWithDisplay):
@@ -58,41 +52,31 @@ class PrimeSerieTestCase(TestCaseWithDisplay):
 
     def setUp(self):
         """Sets up the primes sequence 1, 2, 3, ... up to 19."""
-        self.data = {'1': 1, '2': 2, '3': 3, '5': 5, '7': 7,
-                     '11': 11, '13': 13, '17': 17, '19': 19}
+        self.data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circ.circlify(self.data, with_unit=True)
-        expected = {'19': circ.Circle(x=0.21678789382906316,
-                                      y=-0.028783847098809247,
-                                      r=0.3951965225695486),
-                    '17': circ.Circle(x=-0.5522271151372987,
-                                      y=-0.028783847098809247,
-                                      r=0.37381848639681314),
-                    '13': circ.Circle(x=-0.18749605671356087,
-                                      y=0.5695223800874969,
-                                      r=0.32689478339962186),
-                    '11': circ.Circle(x=-0.1867678466778845,
-                                      y=-0.5957176976830932,
-                                      r=0.3006994658040256),
-                    '7': circ.Circle(x=0.35112628105018256,
-                                     y=-0.6494844830024308,
-                                     r=0.23987519124892365),
-                    '5': circ.Circle(x=0.701442000461867,
-                                     y=-0.3789671749769543,
-                                     r=0.20273153848784445),
-                    '3': circ.Circle(x=0.7690104270712262,
-                                     y=-0.02560249723891397,
-                                     r=0.1570351744628859),
-                    '2': circ.Circle(x=0.6657386565217119,
-                                     y=0.24030106540102816,
-                                     r=0.12821868303433528),
-                    '1': circ.Circle(x=0.49108987864091774,
-                                     y=0.3722387959995559,
-                                     r=0.09066430024838702),
-                    '': circ.Circle(x=0.0, y=0.0, r=1.0)}
-        self.display(actual)
+        actual = circlify(self.data, with_target=True)
+        expected = [Circle(x=0.35776879346704843, y=-0.13064957525245907,
+                           r=0.39529216048201216),
+                    Circle(x=-0.411432317820337, y=-0.13064957525245907,
+                           r=0.3739089508053733),
+                    Circle(x=-0.04661299415374866, y=0.4678014425767657,
+                           r=0.32697389223002427),
+                    Circle(x=-0.045884607890591435, y=-0.6977206243364218,
+                           r=0.3007722353441051),
+                    Circle(x=-0.6132109517981927, y=0.4490810687795324,
+                           r=0.23993324126007678),
+                    Circle(x=0.48296614887228806, y=0.4541723195782383,
+                           r=0.20278059970175755),
+                    Circle(x=0.3252787490004198, y=0.7776370388468007,
+                           r=0.15707317711577193),
+                    Circle(x=-0.40283175658099674, y=0.7512387781681531,
+                           r=0.12824971207048294),
+                    Circle(x=0.09222041925800777, y=0.8617116738294696,
+                           r=0.09068624109026069),
+                    Circle(x=0.0, y=0.0, r=1.0)]
+        self.display(actual, [str(v) for v in self.data])
         self.assertEqual(actual, expected)
 
 
@@ -101,31 +85,25 @@ class CountSerieTestCase(TestCaseWithDisplay):
 
     def setUp(self):
         """Sets up the primes sequence 1, 2, ..."""
-        self.data = {str(n + 1): n + 1 for n in range(6)}
+        self.data = list(range(7, 1, -1))
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circ.circlify(self.data, with_unit=True)
-        expected = {'6': circ.Circle(x=0.2822331001132116,
-                                     y=-0.03461740008821662,
-                                     r=0.4050787227018648),
-                    '5': circ.Circle(x=-0.4926302125706389,
-                                     y=-0.03461740008821662,
-                                     r=0.3697845899819857),
-                    '4': circ.Circle(x=-0.13791069480709892,
-                                     y=0.5694656401496978,
-                                     r=0.3307453920926431),
-                    '3': circ.Circle(x=-0.13589235783967413,
-                                     y=-0.5853994123218175,
-                                     r=0.2864339117368737),
-                    '2': circ.Circle(x=0.3780798126137221,
-                                     y=-0.6663387226474294,
-                                     r=0.23387230959491145),
-                    '1': circ.Circle(x=0.697042106506303,
-                                     y=-0.42621452644002644,
-                                     r=0.16537269604632154),
-                    '': circ.Circle(x=0.0, y=0.0, r=1.0)}
-        self.display(actual)
+        actual = circlify(self.data, with_target=True)
+        expected = [Circle(x=0.5824456027453089, y=-0.08515409741642607,
+                           r=0.41136250504733196),
+                    Circle(x=-0.20976457776763055, y=-0.08515409741642607,
+                           r=0.3808476754656075),
+                    Circle(x=0.15769153632817096, y=0.5438978793053209,
+                           r=0.34766477137653345),
+                    Circle(x=0.15910532107887837, y=-0.6704181394216174,
+                           r=0.31096082487194077),
+                    Circle(x=-0.4586184780594718, y=0.5154819840108337,
+                           r=0.2692999739208646),
+                    Circle(x=-0.7680630545906644, y=0.13661056172475666,
+                           r=0.21988250795031175),
+                    Circle(x=0.0, y=0.0, r=1.0)]
+        self.display(actual, [str(v) for v in self.data])
         self.assertEqual(actual, expected)
 
 
@@ -134,37 +112,27 @@ class GeometricSerieTestCase(TestCaseWithDisplay):
 
     def setUp(self):
         """Sets up the primes sequence 1, 2, ..."""
-        self.data = {str(2 ** (n + 4)): 2 ** (n + 4) for n in range(8)}
+        self.data = sorted([2 ** n for n in range(4, 12)], reverse=True)
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circ.circlify(self.data, with_unit=True)
-        expected = {'2048': circ.Circle(x=0.4139278881798894,
-                                        y=0.023904601986979225,
-                                        r=0.5853824333084535),
-                    '1024': circ.Circle(x=-0.5853824333084535,
-                                        y=0.023904601986979225,
-                                        r=0.4139278881798894),
-                    '512': circ.Circle(x=-0.2216724187314656,
-                                       y=0.6297309670561919,
-                                       r=0.29269121665422676),
-                    '256': circ.Circle(x=-0.2069639440899447,
-                                       y=-0.46834138773459605,
-                                       r=0.2069639440899447),
-                    '128': circ.Circle(x=0.1027482337521121,
-                                       y=-0.6383590536563235,
-                                       r=0.14634560832711338),
-                    '64': circ.Circle(x=-0.11304720098265524,
-                                      y=-0.7642405465859983,
-                                      r=0.10348197204497235),
-                    '32': circ.Circle(x=0.04180888793837325,
-                                      y=-0.8492493795468621,
-                                      r=0.07317280416355669),
-                    '16': circ.Circle(x=-0.18033189486890924,
-                                      y=-0.2058377791940801,
-                                      r=0.051740986022486175),
-                    '': circ.Circle(x=0.0, y=0.0, r=1.0)}
-        self.display(actual)
+        actual = circlify(self.data, with_target=True)
+        self.display(actual, [str(v) for v in self.data])
+        expected = [Circle(x=0.4142135623730951, y=0.0, r=0.5857864376269051),
+                    Circle(x=-0.5857864376269051, y=0.0, r=0.4142135623730951),
+                    Circle(x=-0.2218254069479773, y=0.6062444788590926,
+                           r=0.29289321881345254),
+                    Circle(x=-0.20710678118654763, y=-0.49258571550470814,
+                           r=0.20710678118654754),
+                    Circle(x=0.10281914590763144, y=-0.662720719883036,
+                           r=0.14644660940672627),
+                    Circle(x=-0.11312522101671703, y=-0.7886890904910677,
+                           r=0.10355339059327377),
+                    Circle(x=0.041837742530372556, y=-0.8737565926802316,
+                           r=0.07322330470336313),
+                    Circle(x=-0.18045635173699437, y=-0.22990093891844118,
+                           r=0.051776695296636886),
+                    Circle(x=0.0, y=0.0, r=1.0)]
         self.assertEqual(actual, expected)
 
 

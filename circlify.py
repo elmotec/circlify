@@ -4,9 +4,10 @@
 """Basic circle packing algorithm based on 2 algorithms.
 
 Circles are first arranged via a version of A1.0 by Huang et al (see
-https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then a
-an enclosure circle is created around them using the same algorithm used in 
-d3js (see ?)
+https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then
+enclosed in a circle created around them using Matoušek-Sharir-Welzl algorithm
+used in d3js (see https://beta.observablehq.com/@mbostock/miniball and
+https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
 
 """
 
@@ -25,22 +26,20 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as pltp
 
-    def bubbles(circles, e=None, lim=None):
-        """Debugging function displays circles."""
-        x, y, s, labels = [], [], [], []
+    def bubbles(circles, labels, lim=None):
+        """Debugging function displays circles with matplotlib."""
         fig, ax = plt.subplots(figsize=(8.0, 8.0))
-        for label in circles:
-            x, y, r = circles[label]
+        n_missing_labels = len(circles) - len(labels)
+        if n_missing_labels > 0:
+            labels += [''] * n_missing_labels
+        for circle, label in zip(circles, labels):
+            x, y, r = circle
             ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
                                      linewidth=2, fill=False))
             ax.text(x, y, label)
-            labels.append(label)
-        if e:
-            ax.add_patch(pltp.Circle((e.x, e.y), e.r, alpha=0.2,
-                                     linewidth=2, color='red'))
         if lim is None:
             lim = max([max(abs(c.x) + c.r, abs(c.y) + c.r)
-                       for c in circles.values()])
+                       for c in circles])
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()
@@ -164,47 +163,47 @@ def get_hole_degree(candidate, placed_circles, pc1, pc2):
 def pack_A1_0(data):
     """Pack circles whose radius is linked to the input data.
 
-    This algorithm is loosely based on the Huang et al. heuristic. See
-    https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf.
+    This algorithm is based on the Huang et al. heuristic.
 
     Args:
-        data: dict-like variable with label, value to circlify.
+        data: sorted (descending) list of value to circlify.
 
     Returns:
-        dict with a circ.Circle as value for each label.
+        list of circlify.Circle.
 
     """
-    placed_circles = {}
-    for label in sorted(data, key=data.get, reverse=True):
-        radius = sqrt(data[label])
+    assert data == sorted(data, reverse=True), 'data must be sorted (desc)'
+    placed_circles = []
+    for value in data:
+        radius = sqrt(value)
         n_circles = len(placed_circles)
         # Place first 2 circles on each side of (0, 0)
         if n_circles <= 1:
             x = radius if n_circles == 0 else -radius
             circle = Circle(x, 0.0, radius)
-            placed_circles[label] = circle
+            placed_circles.append(circle)
             continue
         mhd = None
         lead_candidate = None
-        for (c1, c2) in itertools.combinations(placed_circles.values(), 2):
+        for (c1, c2) in itertools.combinations(placed_circles, 2):
             for cand in get_placement_candidates(radius, c1, c2):
                 if cand is not None:
                     # Ignore candidates that overlap with any placed circle.
                     overlap = False
-                    for pc in placed_circles.values():
+                    for pc in placed_circles:
                         if distance(pc, cand) < 0.0:
                             overlap = True
                             break
                     if overlap:
                         continue
-                    hd = get_hole_degree(cand, placed_circles.values(), c1, c2)
+                    hd = get_hole_degree(cand, placed_circles, c1, c2)
                     if mhd is None or hd > mhd:
                         mhd = hd
                         lead_candidate = cand
         if lead_candidate is None:
-            log.info('cannot place circle for data %s', label)
+            log.info('cannot place circle for all values')
             break
-        placed_circles[label] = lead_candidate
+        placed_circles.append(lead_candidate)
     return placed_circles
 
 
@@ -299,29 +298,37 @@ def encloseBasis3(a, b, c):
     return Circle(x1 + xa + xb * r, y1 + ya + yb * r, r)
 
 
-def scale(circles, x, y, r):
-    """Scale cirlces in enclosure to fit in the unit circle.
+def scale(circles, enclosure, target):
+    """Scale circles in enclosure to fit in the target circle.
 
     Args:
-        circles: dict of label and Circle objects to scale.
-        x, y, r: coordinates and radius to scale to.
+        circles: Circle objects to scale.
+        enclusure: Circle that contains all circles.
+        target: target Circle to scale to.
 
     Returns:
-        scaled circles as dict of label and Circles.
+        scaled circles
 
     """
-    scaled = {}
-    for label in circles:
-        x_c, y_c, r_c = circles[label]
-        scaled[label] = Circle((x_c - x) / r, (y_c - y) / r, r_c / r)
+    r = target.r / enclosure.r
+    dx = target.x - enclosure.x
+    dy = target.y - enclosure.y
+    scaled = []
+    for circle in circles:
+        x_c, y_c, r_c = circle
+        scaled.append(Circle((x_c + dx) * r, (y_c + dy) * r, r_c * r))
     return scaled
 
 
-def enclose(packed_circles):
+def enclose(circles):
+    """Shamelessly adapted from d3js.
+
+    See https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js
+
+    """
     B = []
     p, e = None, None
-    circles = [c for c in packed_circles.values()]
-    random.shuffle(circles)
+    #random.shuffle(circles)
 
     n = len(circles)
     i = 0
@@ -333,26 +340,29 @@ def enclose(packed_circles):
             B = extendBasis(B, p)
             e = encloseBasis(B)
             i = 0
-        #import pdb; pdb.set_trace()
-        #bubbles(packed_circles, e)
     return e
 
 
-def circlify(data, with_unit=False):
+def circlify(data, target_scale=None, with_target=False):
     """Pack and enclose circles whose radius is linked to the input data.
 
     Args:
-        data: dict-like variable with label, value to circlify.
-        with_unit: adds the unit circle to the output if True.
+        data: sorted (descending) array of values.
+        target_scale: ciriclify.Circle target circle where circle should fit.
+        with_target: adds the target circle to the output if True.
 
     Returns:
-        dict with a circ.Circle as value for each label.
+        list of circligy.Circle as value for element of data.
 
     """
-    packed_circles = pack_A1_0(data)
-    enclosure = enclose(packed_circles)
-    packed_and_scaled_circles = scale(packed_circles, *enclosure)
-    if with_unit:
-        packed_and_scaled_circles[''] = Circle(0, 0, 1)
-    return packed_and_scaled_circles
+    packed = pack_A1_0(data)
+    enclosure = enclose(packed)
+    if target_scale is None:
+        target_scale = Circle(0.0, 0.0, 1.0)
+    if enclosure is None:
+        return packed
+    packed_and_scaled = scale(packed, enclosure, target_scale)
+    if with_target:
+        packed_and_scaled.append(target_scale)
+    return packed_and_scaled
 
