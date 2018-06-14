@@ -12,13 +12,18 @@ Compatible with Python 2.7 and Python 3.2+.
 
 Using pip:
 
+::
+
     pip install circlify
 
 or using the source:
 
+:: 
+
     git clone git://github.com/elmotec/circlify.git
     cd circlify
     python setup.py install
+
 
 The last step may require `sudo` if you don't have root access.  The `setup.py`
 script uses `setuptools`/`distribute`.
@@ -39,34 +44,32 @@ to the coordinates and radius of cirlces proportional to the corresponding input
 
 Example
 -------
-```python
-import circlify
 
-data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
+.. code:: python
 
-circles = circlify(self.data, with_target=True)
+  import circlify as circ
 
-```
+  data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
+  circles = circ.circlify(self.data, with_target=True)
+
 
 The variable `circles` contains (last one is the enclosure):
 
-```python
+.. code:: python
 
-[Circle(x=0.35776879346704843, y=-0.13064957525245907, r=0.39529216048201216),
- Circle(x=-0.411432317820337, y=-0.13064957525245907, r=0.3739089508053733),
- Circle(x=-0.04661299415374866, y=0.4678014425767657, r=0.32697389223002427),
- Circle(x=-0.045884607890591435, y=-0.6977206243364218, r=0.3007722353441051),
- Circle(x=-0.6132109517981927, y=0.4490810687795324, r=0.23993324126007678),
- Circle(x=0.48296614887228806, y=0.4541723195782383, r=0.20278059970175755),
- Circle(x=0.3252787490004198, y=0.7776370388468007, r=0.15707317711577193),
- Circle(x=-0.40283175658099674, y=0.7512387781681531, r=0.12824971207048294),
- Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069),
- Circle(x=0.0, y=0.0, r=1.0)]
+  [circ.Circle(x=0.35776879346704843, y=-0.13064957525245907, r=0.39529216048201216),
+   circ.Circle(x=-0.411432317820337, y=-0.13064957525245907, r=0.3739089508053733),
+   circ.Circle(x=-0.04661299415374866, y=0.4678014425767657, r=0.32697389223002427),
+   circ.Circle(x=-0.045884607890591435, y=-0.6977206243364218, r=0.3007722353441051),
+   circ.Circle(x=-0.6132109517981927, y=0.4490810687795324, r=0.23993324126007678),
+   circ.Circle(x=0.48296614887228806, y=0.4541723195782383, r=0.20278059970175755),
+   circ.Circle(x=0.3252787490004198, y=0.7776370388468007, r=0.15707317711577193),
+   circ.Circle(x=-0.40283175658099674, y=0.7512387781681531, r=0.12824971207048294),
+   circ.Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069),
+   circ.Circle(x=0.0, y=0.0, r=1.0)]
 
-```
 
-Here is a simple matplotlib representation. See `circlify.bubbles` helper
-function:
+A simple matplotlib representation. See `circlify.bubbles` helper function:
 
 .. figure:: static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
