@@ -6,7 +6,7 @@
 
 import unittest
 
-from circlify import Circle, circlify, bubbles
+from circlify import Circle, circlify
 
 
 # Set this variable to True to get a display of the layout (req matlplotlib)
@@ -42,6 +42,7 @@ class TestCaseWithDisplay(unittest.TestCase):
         """Forwards call to circlify.bubbles()."""
         try:
             if display_layout:
+                from circlify import bubbles
                 bubbles(circles, labels)
         except AttributeError as err:
             log.error("%s. %s", err, "Did you install matplotlib?")
