@@ -122,10 +122,12 @@ def get_placement_candidates(radius, c1, c2):
     i1, i2 = get_intersection(ic1, ic2)
     if i1 is None:
         return None, None
-    candidate1 = Circle(*i1, radius)
+    i1_x, i1_y = i1
+    candidate1 = Circle(i1_x, i1_y, radius)
     if i2 is None:
         return candidate1, None
-    candidate2 = Circle(*i2, radius)
+    i2_x, i2_y = i2
+    candidate2 = Circle(i2_x, i2_y, radius)
     return candidate1, candidate2
 
 
