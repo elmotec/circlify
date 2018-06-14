@@ -347,13 +347,13 @@ def enclose(circles):
     return e
 
 
-def circlify(data, target_scale=None, with_target=False):
+def circlify(data, target_enclosure=None, with_enclosure=False):
     """Pack and enclose circles whose radius is linked to the input data.
 
     Args:
         data: sorted (descending) array of values.
-        target_scale: ciriclify.Circle target circle where circle should fit.
-        with_target: adds the target circle to the output if True.
+        target_enclosure: target ciriclify.Circle where circles should fit in.
+        with_enclosure: appends the target circle to the output if True.
 
     Returns:
         list of circligy.Circle as value for element of data.
@@ -361,12 +361,12 @@ def circlify(data, target_scale=None, with_target=False):
     """
     packed = pack_A1_0(data)
     enclosure = enclose(packed)
-    if target_scale is None:
-        target_scale = Circle(0.0, 0.0, 1.0)
+    if target_enclosure is None:
+        target_enclosure = Circle(0.0, 0.0, 1.0)
     if enclosure is None:
         return packed
-    packed_and_scaled = scale(packed, enclosure, target_scale)
-    if with_target:
-        packed_and_scaled.append(target_scale)
+    packed_and_scaled = scale(packed, enclosure, target_enclosure)
+    if with_enclosure:
+        packed_and_scaled.append(target_enclosure)
     return packed_and_scaled
 

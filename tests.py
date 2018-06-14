@@ -57,7 +57,7 @@ class PrimeSerieTestCase(TestCaseWithDisplay):
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circlify(self.data, with_target=True)
+        actual = circlify(self.data, with_enclosure=True)
         expected = [Circle(x=0.35776879346704843, y=-0.13064957525245907,
                            r=0.39529216048201216),
                     Circle(x=-0.411432317820337, y=-0.13064957525245907,
@@ -90,7 +90,7 @@ class CountSerieTestCase(TestCaseWithDisplay):
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circlify(self.data, with_target=True)
+        actual = circlify(self.data, with_enclosure=True)
         expected = [Circle(x=0.5824456027453089, y=-0.08515409741642607,
                            r=0.41136250504733196),
                     Circle(x=-0.20976457776763055, y=-0.08515409741642607,
@@ -117,7 +117,7 @@ class GeometricSerieTestCase(TestCaseWithDisplay):
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
-        actual = circlify(self.data, with_target=True)
+        actual = circlify(self.data, with_enclosure=True)
         self.display(actual, [str(v) for v in self.data])
         expected = [Circle(x=0.4142135623730951, y=0.0, r=0.5857864376269051),
                     Circle(x=-0.5857864376269051, y=0.0, r=0.4142135623730951),
