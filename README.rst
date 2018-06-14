@@ -71,6 +71,6 @@ The variable `circles` contains (last one is the enclosure):
 
 A simple matplotlib representation. See `circlify.bubbles` helper function:
 
-.. figure:: static/Figure_3.png
+.. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
 
