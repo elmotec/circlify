@@ -1,3 +1,4 @@
+========
 circlify
 ========
 
@@ -25,20 +26,19 @@ or using the source:
     python setup.py install
 
 
-The last step may require `sudo` if you don't have root access.  The `setup.py`
-script uses `setuptools`/`distribute`.
+The last step may require ``sudo`` if you don't have root access.
 
 
 Usage
 -----
 
-The main function `circlify` is supported by a small data class `circlify.Circle` and takes 3 parameters:
+The main function ``circlify`` is supported by a small data class ``circlify.Circle`` and takes 3 parameters:
 
 * A list of positive values sorted from largest to smallest.
 * (optional) A target enclosure where the packed circles should fit. It defaults to the unit circle (0, 0, 1).
 * (optional) A boolean indicating if the target enclosure should be appended to the output.
 
-The function returns a list of `circlify.Circle` objects, each one corresponding
+The function returns a list of ``circlify.Circle`` objects, each one corresponding
 to the coordinates and radius of cirlces proportional to the corresponding input value.
 
 
@@ -68,8 +68,7 @@ The variable `circles` contains (last one is the enclosure):
    circ.Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069),
    circ.Circle(x=0.0, y=0.0, r=1.0)]
 
-
-A simple matplotlib representation. See `circlify.bubbles` helper function:
+A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
 
 .. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
