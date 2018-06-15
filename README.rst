@@ -50,7 +50,7 @@ Example
   import circlify as circ
 
   data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
-  circles = circ.circlify(self.data, with_enclosure=True)
+  circles = circ.circlify(data, with_enclosure=True)
 
 
 The variable `circles` contains (last one is the enclosure):
