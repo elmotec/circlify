@@ -23,12 +23,13 @@
     :alt: Codacy
 
 
+========
 circlify
 ========
 
 Pure Python implementation of circle packing layout algorithm.
 
-Circles are first arranged via a version of A1.0 by Huang et al (see https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then enclosed in a circle created around them using Matoušek-Sharir-Welzl algorithm used in d3js (see https://beta.observablehq.com/@mbostock/miniball, https://beta.observablehq.com/@mbostock/miniball, and https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
+Circles are first arranged via a version of A1.0 by Huang et al (see https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then enclosed in a circle created around them using Matoušek-Sharir-Welzl algorithm used in d3js (see https://beta.observablehq.com/@mbostock/miniball, http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf, and https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
 
 Installation
 ------------
@@ -50,20 +51,19 @@ or using the source:
     python setup.py install
 
 
-The last step may require `sudo` if you don't have root access.  The `setup.py`
-script uses `setuptools`/`distribute`.
+The last step may require ``sudo`` if you don't have root access.
 
 
 Usage
 -----
 
-The main function `circlify` is supported by a small data class `circlify.Circle` and takes 3 parameters:
+The main function ``circlify`` is supported by a small data class ``circlify.Circle`` and takes 3 parameters:
 
 * A list of positive values sorted from largest to smallest.
 * (optional) A target enclosure where the packed circles should fit. It defaults to the unit circle (0, 0, 1).
 * (optional) A boolean indicating if the target enclosure should be appended to the output.
 
-The function returns a list of `circlify.Circle` objects, each one corresponding
+The function returns a list of ``circlify.Circle`` objects, each one corresponding
 to the coordinates and radius of cirlces proportional to the corresponding input value.
 
 
@@ -75,7 +75,7 @@ Example
   import circlify as circ
 
   data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
-  circles = circ.circlify(self.data, with_enclosure=True)
+  circles = circ.circlify(data, with_enclosure=True)
 
 
 The variable `circles` contains (last one is the enclosure):
@@ -93,8 +93,7 @@ The variable `circles` contains (last one is the enclosure):
    circ.Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069),
    circ.Circle(x=0.0, y=0.0, r=1.0)]
 
-
-A simple matplotlib representation. See `circlify.bubbles` helper function:
+A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
 
 .. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
