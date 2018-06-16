@@ -1,3 +1,28 @@
+.. image:: https://img.shields.io/pypi/v/circlify.svg
+    :target: https://pypi.org/pypi/circlify/
+    :alt: PyPi version
+
+.. image:: https://img.shields.io/pypi/pyversions/circlify.svg
+    :target: https://pypi.org/pypi/circlify/
+    :alt: Python compatibility
+
+.. image:: https://img.shields.io/travis/elmotec/circlify.svg
+    :target: https://travis-ci.org/elmotec/circlify
+    :alt: Build Status
+
+.. image:: https://img.shields.io/pypi/dm/circlify.svg
+    :alt: PyPi
+    :target: https://pypi.python.org/pypi/circlify
+
+.. image:: https://coveralls.io/repos/elmotec/circlify/badge.svg
+    :target: https://coveralls.io/r/elmotec/circlify
+    :alt: Coverage
+
+.. image:: https://img.shields.io/codacy/474b0af6853a4c5f8f9214d3220571f9.svg
+    :target: https://www.codacy.com/app/elmotec/circlify/dashboard
+    :alt: Codacy
+
+
 circlify
 ========
 
