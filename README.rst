@@ -10,10 +10,6 @@
     :target: https://travis-ci.org/elmotec/circlify
     :alt: Build Status
 
-.. image:: https://img.shields.io/pypi/dm/circlify.svg
-    :alt: PyPi
-    :target: https://pypi.python.org/pypi/circlify
-
 .. image:: https://coveralls.io/repos/elmotec/circlify/badge.svg
     :target: https://coveralls.io/r/elmotec/circlify
     :alt: Coverage
