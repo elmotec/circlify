@@ -6,7 +6,7 @@
 
 import unittest
 
-from circlify import Circle, circlify
+from circlify import Circle, circlify, scale
 
 
 # Set this variable to True to get a display of the layout (req matlplotlib)
@@ -135,6 +135,40 @@ class GeometricSerieTestCase(TestCaseWithDisplay):
                            r=0.051776695296636886),
                     Circle(x=0.0, y=0.0, r=1.0)]
         self.assertEqual(actual, expected)
+
+
+class EnclosureScalingTestCase(unittest.TestCase):
+    """Test scale function"""
+
+    def test_simple_zoom(self):
+        """Trivial zoom test when the enclosure is the same as the circle."""
+        input = Circle(0, 0, 0.5)
+        target = Circle(0, 0, 1.0)
+        actual = scale([input], input, target)
+        self.assertEqual([target], actual)
+
+    def test_simple_zoom_off_center(self):
+        """Zoom test with off center circle equal to enclosure."""
+        input = Circle(0.5, 0.5, 0.5)
+        target = Circle(0.5, 0.5, 1.0)
+        actual = scale([input], input, target)
+        self.assertEqual([target], actual)
+
+    def test_simple_zoom_and_translation(self):
+        """Pan and zoom test with off center circle equal to enclosure."""
+        input = Circle(0.5, 0.5, 0.5)
+        target = Circle(-0.5, 0, 1.0)
+        actual = scale([input], input, target)
+        self.assertEqual([target], actual)
+
+    def test_zoom_with_enclosure(self):
+        """Zoom test with off center circle and difference enclosure"""
+        input = Circle(1.0, 0.0, 1.0)
+        enclosure = Circle(0.0, 0.0, 2.0)
+        target = Circle(0.0, 0.0, 1.0)
+        actual = scale([input], enclosure, target)
+        expected = Circle(0.5, 0.0, 0.5)
+        self.assertEqual([expected], actual)
 
 
 if __name__ == '__main__':

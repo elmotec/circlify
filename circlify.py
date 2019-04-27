@@ -315,12 +315,13 @@ def scale(circles, enclosure, target):
 
     """
     r = target.r / enclosure.r
-    dx = target.x - enclosure.x
-    dy = target.y - enclosure.y
+    t_x, t_y = target.x, target.y
+    e_x, e_y = enclosure.x, enclosure.y
     scaled = []
     for circle in circles:
-        x_c, y_c, r_c = circle
-        scaled.append(Circle((x_c + dx) * r, (y_c + dy) * r, r_c * r))
+        c_x, c_y, c_r = circle
+        scaled.append(Circle((c_x - e_x) * r + t_x,
+                             (c_y - e_y) * r + t_y, c_r * r))
     return scaled
 
 
@@ -347,6 +348,7 @@ def enclose(circles):
     return e
 
 
+# FIXME: remove with_enclosure because it complicates the interface.
 def circlify(data, target_enclosure=None, with_enclosure=False):
     """Pack and enclose circles whose radius is linked to the input data.
 
