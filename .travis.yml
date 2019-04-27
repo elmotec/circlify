@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 
 # When adding a version here, remember to change it in setup.py
