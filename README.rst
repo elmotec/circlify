@@ -30,8 +30,6 @@ Circles are first arranged via a version of A1.0 by Huang et al (see https://hom
 Installation
 ------------
 
-Compatible with Python 2.7 and Python 3.2+.
-
 Using pip:
 
 ::
