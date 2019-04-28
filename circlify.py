@@ -19,32 +19,76 @@ import itertools
 import logging
 
 
-__version__ = '0.9.3'
+__version__ = '0.10.0'
 
 
 try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as pltp
 
-    def bubbles(circles, labels, lim=None):
+    def bubbles(elements, lim=None):
         """Debugging function displays circles with matplotlib."""
         fig, ax = plt.subplots(figsize=(8.0, 8.0))
-        n_missing_labels = len(circles) - len(labels)
-        if n_missing_labels > 0:
-            labels += [''] * n_missing_labels
-        for circle, label in zip(circles, labels):
-            x, y, r = circle
+        for elem in elements:
+            x, y, r = elem.circle
             ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
                                      linewidth=2, fill=False))
+            label = elem.id_ if elem.id_ is not None else elem.datum
             ax.text(x, y, label)
         if lim is None:
-            lim = max([max(abs(c.x) + c.r, abs(c.y) + c.r)
-                       for c in circles])
+            lim = max([max(abs(elem.circle.x) + elem.circle.r,
+                           abs(elem.circle.y) + elem.circle.r)
+                       for elem in elements])
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()
 except ImportError:
     pass
+
+
+Circle = collections.namedtuple('Circle', ['x', 'y', 'r'])
+FieldNames = collections.namedtuple('Field', ['id', 'datum', 'children'])
+
+class Element:
+    """Hierarchy element.
+
+    Used as an intermediate and output data structure.
+
+    """
+
+    __slots__ = ['level', 'datum', 'id_', 'children', 'circle']
+
+    def __init__(self, level, datum, id_=None, children=None, circle=None):
+        """Initialize Output data structure.
+
+        Args:
+            level (int): depth level of the data where 0 is the root of the
+                hierarchy.
+            datum (float): value that used the size of the circle.
+            id_ (str): optional ID that can be used to identify the element.
+            children (list): optional list of other Output at the lower level.
+            circle (Circle): coords of the circle that represent the element.
+
+        """
+        self.level = level
+        self.datum = datum
+        self.id_ = id_
+        self.children = children
+        self.circle = circle
+
+    def __lt__(self, other):
+        """Reversed level order, then normal ordering on datum."""
+        return (-self.level, self.datum) < (-other.level, other.datum)
+
+    def __eq__(self, other):
+        """Compare level and datum. No order on id, children and circle."""
+        return (self.level, self.datum) == (other.level, other.datum)
+
+    def __repr__(self):
+        """Representation of Output"""
+        return "{}(level={}, datum={}, id_={!r}, children={}, circle={})".\
+            format(self.__class__.__name__, self.level, self.datum, self.id_,
+                   self.children, self.circle)
 
 
 log = logging.getLogger(__name__)
@@ -168,7 +212,7 @@ def pack_A1_0(data):
         data: sorted (descending) list of value to circlify.
 
     Returns:
-        list of circlify.Circle.
+        list of circlify.Output.
 
     """
     assert data == sorted(data, reverse=True), 'data must be sorted (desc)'
@@ -309,7 +353,7 @@ def scale(circles, target, enclosure=None):
         enclosure: allows one to specify the enclosure.
 
     Returns:
-        scaled circles
+        scaled circle
 
     """
     if not circles:
@@ -321,12 +365,8 @@ def scale(circles, target, enclosure=None):
     r = target.r / enclosure.r
     t_x, t_y = target.x, target.y
     e_x, e_y = enclosure.x, enclosure.y
-    scaled = []
-    for circle in circles:
-        c_x, c_y, c_r = circle
-        scaled.append(Circle((c_x - e_x) * r + t_x,
-                             (c_y - e_y) * r + t_y, c_r * r))
-    return scaled
+    c_x, c_y, c_r = circle
+    return Circle((c_x - e_x) * r + t_x, (c_y - e_y) * r + t_y, c_r * r)
 
 
 def enclose(circles):
@@ -342,7 +382,7 @@ def enclose(circles):
     n = len(circles)
     i = 0
     while i < n:
-        p = circles[i];
+        p = circles[i]
         if e is not None and enclosesWeak(e, p):
             i = i + 1
         else:
@@ -352,17 +392,48 @@ def enclose(circles):
     return e
 
 
-# FIXME: remove with_enclosure because it complicates the interface.
-def circlify(data, target_enclosure=None, with_enclosure=False):
+def _handle(data, level, fields=None):
+    """Converts possibly heterogeneous list of float or dict in list of Output.
+
+    Return:
+        list of list of Output. There is one list per level and the (level
+        specific) sub-list sorts data by descending order.
+
+    """
+    if fields is None:
+        fields = FieldNames(None, None, None)
+    datum_field = fields.datum if fields.datum else 'datum'
+    id_field = fields.id if fields.id else 'id'
+    child_field = fields.children if fields.children else 'children'
+    elements = []
+    for datum in data:
+        try:  # try to leverage element as a numeric value.
+            elements.append(Element(level, datum + 0, None, None, None))
+        except TypeError:  # if it fails, assume dict.
+            if not isinstance(datum, dict):
+                raise TypeError('dict or numeric value expected')
+            value = datum[datum_field]
+            id_ = datum[id_field] if id_field in datum else None
+            children = _handle(datum[child_field], level + 1, fields) \
+                if child_field in datum else None
+            elements.append(Element(level, value, id_, children, None))
+    return sorted(elements, reverse=True)
+
+
+def _circlify_level(data, target_enclosure, fields, with_enclosure=True):
     """Pack and enclose circles whose radius is linked to the input data.
 
+    All the elements of data are expected to be for the same parent circle
+    called enclosure.
+
     Args:
-        data: sorted (descending) array of values.
-        target_enclosure: target ciriclify.Circle where circles should fit in.
-        with_enclosure: appends the target circle to the output if True.
+        data (list of Element): structured data to be process.
+        target_enclosure (Circle): target enclosure to fit the cirlces into.
+        fields (FieldNames): field names.
+        with_enclosure (bool):
 
     Returns:
-        list of circligy.Circle as value for element of data.
+        list of circlify.Output as value for element of data.
 
     """
     packed = pack_A1_0(data)
@@ -371,5 +442,49 @@ def circlify(data, target_enclosure=None, with_enclosure=False):
     packed_and_scaled = scale(packed, target_enclosure)
     if with_enclosure:
         packed_and_scaled.append(target_enclosure)
-    return packed_and_scaled
+    for circle, elem in zip(packed, data):
+        elem.circle = scale(circle, target_enclosure)
+        elem.children = _circlify_level(elem.children, elem.circle, fields)
+    return data
 
+
+def _flatten(elements, flattened):
+    """Flattens the elements hierarchy."""
+    if elements is None:
+        return
+    for elem in elements:
+        _flatten(elem.children, flattened)
+        elem.children = None
+        flattened.append(elem)
+    return flattened
+
+
+def circlify(data, target_enclosure=None, show_enclosure=False,
+             datum_field='datum', id_field='id', children_field='children'):
+    """Pack and enclose circles whose radius is linked to the input data.
+
+    Args:
+        data: sorted (descending) array of values.
+        target_enclosure: target circlify.Circle where circles should fit in.
+            Defaults to unit circle centered on (0, 0).
+        show_enclosure: insert the target enclosure to the output if True.
+        datum_field: field name that contains the float value when the element is
+            a dict.
+        id_field: field name that contains the id when the element is a dict.
+        children_field: field name that contains the children list when the
+            element is a dict.
+
+    Returns:
+        list of circlify.Element sorted by ascending level (root to leaf) and
+        descending value (biggest circles first).
+
+    """
+    fields = FieldNames(id=id_field, datum=datum_field, children=children_field)
+    elements = _handle(data, 1, fields)
+    if target_enclosure is None:
+        target_enclosure = Circle(0.0, 0.0, 1.0)
+    elements = _circlify_level(elements, target_enclosure, fields)
+    if show_enclosure:
+        elements.append(Element(0, None, circle=target_enclosure))
+    flattened = []
+    return sorted(_flatten(elements, flattened), reverse=True)
