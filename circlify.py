@@ -14,11 +14,9 @@ https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
 
 import sys
 import math
-from math import sqrt, pi
 import collections
 import itertools
 import logging
-import random
 
 
 __version__ = '0.9.2'
@@ -49,11 +47,12 @@ except ImportError:
     pass
 
 
-Circle = collections.namedtuple('Circle', ['x', 'y', 'r'])
-
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
+_eps = sys.float_info.epsilon
+
+Circle = collections.namedtuple('Circle', ['x', 'y', 'r'])
 
 def distance(circle1, circle2):
     """Compute distance between 2 cirlces."""
@@ -61,7 +60,7 @@ def distance(circle1, circle2):
     x2, y2, r2 = circle2
     x = x2 - x1
     y = y2 - y1
-    return sqrt(x * x + y * y) - r1 - r2
+    return math.sqrt(x * x + y * y) - r1 - r2
 
 
 def get_intersection(circle1, circle2):
@@ -78,7 +77,7 @@ def get_intersection(circle1, circle2):
     x1, y1, r1 = circle1
     x2, y2, r2 = circle2
     dx, dy = x2 - x1, y2 - y1
-    d = sqrt(dx * dx + dy * dy)
+    d = math.sqrt(dx * dx + dy * dy)
     if d > r1 + r2:
         log.debug('no solution, the circles are separate: %s, %s',
                   circle1, circle2)
@@ -92,7 +91,7 @@ def get_intersection(circle1, circle2):
                   circle1, circle2)
         return None, None
     a = (r1 * r1 - r2 * r2 + d * d) / (2 * d)
-    h = sqrt(r1 * r1 - a * a)
+    h = math.sqrt(r1 * r1 - a * a)
     xm = x1 + a * dx / d
     ym = y1 + a* dy / d
     xs1 = xm + h * dy / d
@@ -104,19 +103,19 @@ def get_intersection(circle1, circle2):
     return (xs1, ys1), (xs2, ys2)
 
 
-def get_placement_candidates(radius, c1, c2):
+def get_placement_candidates(radius, c1, c2, margin):
     """Generate placement candidates for 2 existing placed circles.
 
     Args:
         radius: radius of the new circle to place.
         c1: first existing placed circle.
         c2: second existing placed circle.
+        margin: extra padding between the candidates and existing c1 and c2.
 
     Returns:
         A pair of candidate cirlces where one or both value can be None.
 
     """
-    margin = 10.0 * sys.float_info.epsilon
     ic1 = Circle(c1.x, c1.y, c1.r + (radius + margin))
     ic2 = Circle(c2.x, c2.y, c2.r + (radius + margin))
     i1, i2 = get_intersection(ic1, ic2)
@@ -149,19 +148,15 @@ def get_hole_degree(candidate, placed_circles, pc1, pc2):
         used to place the candidate and r_i the radius of the candidate.
 
     """
-    #min_dist = None
     lsq = 0.
     for pc in placed_circles:
         if pc1 is not None and pc1 == pc:
             continue
         if pc2 is not None and pc2 == pc:
             continue
-        lsq += sqrt((candidate.y - pc.y) ** 2.0 + (candidate.x - pc.x) ** 2.0)
-        #if min_dist is None or min_dist > dist:
-            #min_dist = dist
-    #if min_dist is None:
-        #return 0.0
-    return -sqrt(lsq)
+        lsq += math.sqrt((candidate.y - pc.y) ** 2.0 +
+                         (candidate.x - pc.x) ** 2.0)
+    return -math.sqrt(lsq)
 
 
 def pack_A1_0(data):
@@ -179,23 +174,27 @@ def pack_A1_0(data):
     assert data == sorted(data, reverse=True), 'data must be sorted (desc)'
     placed_circles = []
     for value in data:
-        radius = sqrt(value)
+        radius = math.sqrt(value)
         n_circles = len(placed_circles)
         # Place first 2 circles on each side of (0, 0)
         if n_circles <= 1:
             x = radius if n_circles == 0 else -radius
-            circle = Circle(x, 0.0, radius)
+            circle = Circle(x, float(0.0), radius)
             placed_circles.append(circle)
             continue
         mhd = None
         lead_candidate = None
         for (c1, c2) in itertools.combinations(placed_circles, 2):
-            for cand in get_placement_candidates(radius, c1, c2):
+            margin = float(_eps)
+            for cand in get_placement_candidates(radius, c1, c2, margin):
                 if cand is not None:
                     # Ignore candidates that overlap with any placed circle.
+                    other_placed_circles = [circ for circ in placed_circles
+                                            if circ not in [c1, c2]]
                     overlap = False
-                    for pc in placed_circles:
-                        if distance(pc, cand) < 0.0:
+                    for pc in other_placed_circles:
+                        dist =  distance(pc, cand)
+                        if dist < -_eps:
                             overlap = True
                             break
                     if overlap:
@@ -205,8 +204,7 @@ def pack_A1_0(data):
                         mhd = hd
                         lead_candidate = cand
         if lead_candidate is None:
-            log.info('cannot place circle for all values')
-            break
+            raise ValueError('cannot place circle for value %f', value)
         placed_circles.append(lead_candidate)
     return placed_circles
 
@@ -268,7 +266,7 @@ def encloseBasis2(a, b):
     x21 = x2 - x1
     y21 = y2 - y1
     r21 = r2 - r1
-    l = sqrt(x21 * x21 + y21 * y21);
+    l = math.sqrt(x21 * x21 + y21 * y21);
     return Circle((x1 + x2 + x21 / l * r21) / 2,
                   (y1 + y2 + y21 / l * r21) / 2,
                   (l + r1 + r2) / 2)
@@ -296,24 +294,30 @@ def encloseBasis3(a, b, c):
     B = 2 * (r1 + xa * xb + ya * yb)
     C = xa * xa + ya * ya - r1 * r1
     if A != 0.0:
-        r = -(B + sqrt(B * B - 4 * A * C)) / (2 * A)
+        r = -(B + math.sqrt(B * B - 4 * A * C)) / (2 * A)
     else:
         r = -C / B
     return Circle(x1 + xa + xb * r, y1 + ya + yb * r, r)
 
 
-def scale(circles, enclosure, target):
+def scale(circles, target, enclosure=None):
     """Scale circles in enclosure to fit in the target circle.
 
     Args:
         circles: Circle objects to scale.
-        enclusure: Circle that contains all circles.
         target: target Circle to scale to.
+        enclosure: allows one to specify the enclosure.
 
     Returns:
         scaled circles
 
     """
+    if not circles:
+        return circles
+    if not enclosure:
+        enclosure = enclose(circles)
+    if enclosure is None:
+        raise ValueError('cannot enclose circles')
     r = target.r / enclosure.r
     t_x, t_y = target.x, target.y
     e_x, e_y = enclosure.x, enclosure.y
@@ -362,12 +366,9 @@ def circlify(data, target_enclosure=None, with_enclosure=False):
 
     """
     packed = pack_A1_0(data)
-    enclosure = enclose(packed)
     if target_enclosure is None:
-        target_enclosure = Circle(0.0, 0.0, 1.0)
-    if enclosure is None:
-        return packed
-    packed_and_scaled = scale(packed, enclosure, target_enclosure)
+        target_enclosure = Circle(float(0.0), float(0.0), float(1.0))
+    packed_and_scaled = scale(packed, target_enclosure)
     if with_enclosure:
         packed_and_scaled.append(target_enclosure)
     return packed_and_scaled
