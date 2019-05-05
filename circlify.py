@@ -26,19 +26,19 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as pltp
 
-    def bubbles(elements, lim=None):
+    def bubbles(circles, lim=None):
         """Debugging function displays circles with matplotlib."""
         fig, ax = plt.subplots(figsize=(8.0, 8.0))
-        for elem in elements:
-            x, y, r = elem.circle
+        for circle in circles:
+            x, y, r = circle.circle
             ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
                                      linewidth=2, fill=False))
-            label = elem.id_ if elem.id_ is not None else elem.datum
+            label = circle.datum
             ax.text(x, y, label)
         if lim is None:
-            lim = max([max(abs(elem.circle.x) + elem.circle.r,
-                           abs(elem.circle.y) + elem.circle.r)
-                       for elem in elements])
+            lim = max([max(abs(circle.circle.x) + circle.circle.r,
+                           abs(circle.circle.y) + circle.circle.r)
+                       for circle in circles])
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()

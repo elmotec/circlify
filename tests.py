@@ -64,11 +64,11 @@ class SpecialCases(unittest.TestCase):
 class TestCaseWithDisplay(unittest.TestCase):
     """Display the result of the placement of the circle."""
 
-    def display(self, circles, labels):
+    def display(self, circles):
         """Forwards call to circ.circlify.bubbles()."""
         try:
             if display_layout:
-                circ.bubbles(circles, labels)
+                circ.bubbles(circles)
         except AttributeError as err:
             print("%s. %s".format(err, "Did you install matplotlib?"))
             raise
@@ -122,7 +122,7 @@ class PrimeSerieTestCase(TestCaseWithDisplay):
                                             y=-0.13064957525245907,
                                             r=0.39529216048201216)),
         ]
-        self.display(actual, [str(v) for v in self.data])
+        self.display(actual)
         self.assertEqual(expected, actual)
 
 
@@ -139,25 +139,30 @@ class CountSerieTestCase(TestCaseWithDisplay):
         expected = [
             circ.Circle(0, None, circle=circ._Circle(x=0.0, y=0.0, r=1.0)),
             circ.Circle(1, 2,
-                   circle=circ._Circle(x=-0.7680630545906644, y=0.13661056172475666,
-                                  r=0.21988250795031175)),
+                        circle=circ._Circle(x=-0.7680630545906644,
+                                            y=0.13661056172475666,
+                                            r=0.21988250795031175)),
             circ.Circle(1, 3,
-                   circle=circ._Circle(x=-0.4586184780594718, y=0.5154819840108337,
-                                  r=0.2692999739208646)),
+                        circle=circ._Circle(x=-0.4586184780594718,
+                                            y=0.5154819840108337,
+                                            r=0.2692999739208646)),
             circ.Circle(1, 4,
-                   circle=circ._Circle(x=0.15910532107887837, y=-0.6704181394216174,
-                                  r=0.31096082487194077)),
+                        circle=circ._Circle(x=0.15910532107887837,
+                                            y=-0.6704181394216174,
+                                            r=0.31096082487194077)),
             circ.Circle(1, 5,
-                   circle=circ._Circle(x=0.15769153632817096, y=0.5438978793053209,
-                                  r=0.34766477137653345)),
+                        circle=circ._Circle(x=0.15769153632817096,
+                                            y=0.5438978793053209,
+                                            r=0.34766477137653345)),
             circ.Circle(1, 6, circle=circ._Circle(x=-0.20976457776763055,
-                                                    y=-0.08515409741642607,
-                                                    r=0.3808476754656075)),
+                                                  y=-0.08515409741642607,
+                                                  r=0.3808476754656075)),
             circ.Circle(1, 7,
-                   circle=circ._Circle(x=0.5824456027453089, y=-0.08515409741642607,
-                                  r=0.41136250504733196))
+                        circle=circ._Circle(x=0.5824456027453089,
+                                            y=-0.08515409741642607,
+                                            r=0.41136250504733196))
         ]
-        self.display(actual, [str(v) for v in self.data])
+        self.display(actual)
         self.assertEqual(expected, actual)
 
 
@@ -171,7 +176,7 @@ class GeometricSerieTestCase(TestCaseWithDisplay):
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
         actual = circ.circlify(self.data, show_enclosure=True)
-        self.display(actual, [str(v) for v in self.data])
+        self.display(actual)
         expected = [
             circ.Circle(0, None, circle=circ._Circle(x=0.0, y=0.0, r=1.0)),
             circ.Circle(1, 16,
