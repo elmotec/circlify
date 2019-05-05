@@ -77,6 +77,16 @@ class Circle:
         self.circle = circle
         self.ex = ex
 
+    @classmethod
+    def from_circle(kls, x=0.0, y=0.0, r=1.0):
+        """Constructs a Circle from _Circle attributes.
+
+        level is set to 1, datum and ex are set to None.
+
+        """
+        return Circle(1, r, _Circle(x, y, r))
+
+
     def __lt__(self, other):
         """Reversed level order, then normal ordering on datum."""
         return (self.level, self.datum) < (other.level, other.datum)
@@ -97,7 +107,7 @@ log.addHandler(logging.NullHandler())
 
 _eps = sys.float_info.epsilon
 
-Circle = collections.namedtuple('Circle', ['x', 'y', 'r'])
+_Circle = collections.namedtuple('_Circle', ['x', 'y', 'r'])
 
 def distance(circle1, circle2):
     """Compute distance between 2 cirlces."""
@@ -225,7 +235,7 @@ def pack_A1_0(data):
         # Place first 2 circles on each side of (0, 0)
         if n_circles <= 1:
             x = radius if n_circles == 0 else -radius
-            circle = Circle(x, float(0.0), radius)
+            circle = _Circle(x, float(0.0), radius)
             placed_circles.append(circle)
             continue
         mhd = None
@@ -258,12 +268,12 @@ def pack_A1_0(data):
 def extendBasis(B, p):
     """Extend basis to ...  """
     if enclosesWeakAll(p, B):
-        return [p];
+        return [p]
 
     # If we get here then B must have at least one element.
     for i in range(len(B)):
         if enclosesNot(p, B[i]) and enclosesWeakAll(encloseBasis2(B[i], p), B):
-            return [B[i], p];
+            return [B[i], p]
 
     # If we get here then B must have at least two elements.
     for i in range(len(B) - 1):
@@ -272,7 +282,7 @@ def extendBasis(B, p):
                     enclosesNot(encloseBasis2(B[i], p), B[j]) and \
                     enclosesNot(encloseBasis2(B[j], p), B[i]) and \
                     enclosesWeakAll(encloseBasis3(B[i], B[j], p), B):
-                return [B[i], B[j], p];
+                return [B[i], B[j], p]
     raise RuntimeError('If we get here then something is very wrong')
 
 
@@ -313,7 +323,7 @@ def encloseBasis2(a, b):
     y21 = y2 - y1
     r21 = r2 - r1
     l = math.sqrt(x21 * x21 + y21 * y21);
-    return Circle((x1 + x2 + x21 / l * r21) / 2,
+    return _Circle((x1 + x2 + x21 / l * r21) / 2,
                   (y1 + y2 + y21 / l * r21) / 2,
                   (l + r1 + r2) / 2)
 
@@ -346,11 +356,11 @@ def encloseBasis3(a, b, c):
     return _Circle(x1 + xa + xb * r, y1 + ya + yb * r, r)
 
 
-def scale(circles, target, enclosure=None):
-    """Scale circles in enclosure to fit in the target circle.
+def scale(circle, target, enclosure):
+    """Scale circle in enclosure to fit in the target circle.
 
     Args:
-        circles: Circle objects to scale.
+        circle: Circle to scale.
         target: target Circle to scale to.
         enclosure: allows one to specify the enclosure.
 
@@ -358,12 +368,6 @@ def scale(circles, target, enclosure=None):
         scaled circle
 
     """
-    if not circles:
-        return circles
-    if not enclosure:
-        enclosure = enclose(circles)
-    if enclosure is None:
-        raise ValueError('cannot enclose circles')
     r = target.r / enclosure.r
     t_x, t_y = target.x, target.y
     e_x, e_y = enclosure.x, enclosure.y
@@ -439,18 +443,18 @@ def _circlify_level(data, target_enclosure, fields, with_enclosure=True):
 
     """
     all_circles = []
-    if elements is None:
+    if data is None:
         return all_circles
-    packed = pack_A1_0([elem.datum for elem in elements])
+    packed = pack_A1_0([elem.datum for elem in data])
     enclosure = enclose(packed)
     if enclosure is None:
         enclosure = target_enclosure
-    for circle, elem in zip(packed, elements):
-        elem.circle = scale(circle, enclosure, target_enclosure)
+    for circle, elem in zip(packed, data):
+        elem.circle = scale(circle, target_enclosure, enclosure)
         if elem.ex and fields.children in elem.ex:
             all_circles.append(_circlify_level(elem.ex[fields.children],
                                                elem.circle, fields))
-    return all_circles + elements
+    return all_circles + data
 
 
 def _flatten(elements, flattened):
