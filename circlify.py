@@ -58,33 +58,34 @@ class Circle:
 
     __slots__ = ['level', 'datum', 'circle', 'ex']
 
-    def __init__(self, level, datum, circle=None, ex=None):
+    def __init__(self, level, datum=None, x=0.0, y=0.0, r=0.0, ex=None):
         """Initialize Output data structure.
 
         Args:
             level (int): depth level of the data where 0 is the root of the
                 hierarchy.
             datum (float): value that used the size of the circle.
-            circle (Circle): coords of the circle that represent the element.
+            x (float): x coordinate of the circle center.
+            y (float): y coordinate of the circle center.
+            r (float): radius of the circle.
             ex (dict): additional data to be carried by the structure (e.g.
                 label, name, parent_id, ...)
 
         """
-        # FIXME hide the inner circle within circle exposing x, y, and r.
-        # FIXME replace datum with r.
         self.level = level
         self.datum = datum
-        self.circle = circle
+        self.circle = _Circle(x, y, r)
         self.ex = ex
 
     @classmethod
     def from_circle(kls, x=0.0, y=0.0, r=1.0):
         """Constructs a Circle from _Circle attributes.
 
-        level is set to 1, datum and ex are set to None.
+        Eases the creation of Circle objects. The level is set to 1, datum and
+        ex are set to None.
 
         """
-        return Circle(1, r, _Circle(x, y, r))
+        return Circle(1, r, x, y, r)
 
 
     def __lt__(self, other):
@@ -97,9 +98,21 @@ class Circle:
 
     def __repr__(self):
         """Representation of Output"""
-        return "{}(level={}, datum={}, circle={}, ex={!r})".\
+        return "{}(level={}, datum={}, x={}, y={}, r={}, ex={!r})".\
             format(self.__class__.__name__, self.level, self.datum,
-                   self.circle, self.ex)
+                   self.x, self.y, self.r, self.ex)
+
+    @property
+    def x(self):
+        return self.circle.x
+
+    @property
+    def y(self):
+        return self.circle.y
+
+    @property
+    def r(self):
+        return self.circle.r
 
 
 log = logging.getLogger(__name__)
@@ -247,14 +260,11 @@ def pack_A1_0(data):
                     # Ignore candidates that overlap with any placed circle.
                     other_placed_circles = [circ for circ in placed_circles
                                             if circ not in [c1, c2]]
-                    overlap = False
-                    for pc in other_placed_circles:
-                        dist =  distance(pc, cand)
-                        if dist < -_eps:
-                            overlap = True
-                            break
-                    if overlap:
-                        continue
+                    if other_placed_circles:
+                        min_dist = min([distance(pc, cand)
+                                        for pc in other_placed_circles])
+                        if min_dist < -_eps:
+                            continue
                     hd = get_hole_degree(cand, placed_circles, c1, c2)
                     if mhd is None or hd > mhd:
                         mhd = hd
@@ -419,14 +429,11 @@ def _handle(data, level, fields=None):
             if not isinstance(datum, dict):
                 raise TypeError('dict or numeric value expected')
             value = datum[datum_field]
-            id_ = datum[id_field] if id_field in datum else None
-            children = _handle(datum[child_field], level + 1, fields) \
-                if child_field in datum else None
-            elements.append(Circle(level, value, None))
+            elements.append(Circle(level, value, ex=datum))
     return sorted(elements, reverse=True)
 
 
-def _circlify_level(data, target_enclosure, fields, with_enclosure=True):
+def _circlify_level(data, target_enclosure, fields, level=1):
     """Pack and enclose circles whose radius is linked to the input data.
 
     All the elements of data are expected to be for the same parent circle
@@ -436,25 +443,27 @@ def _circlify_level(data, target_enclosure, fields, with_enclosure=True):
         elements (list of Circle): structured data to be process.
         target_enclosure (Circle): target enclosure to fit the cirlces into.
         fields (FieldNames): field names.
-        with_enclosure (bool):
+        level (int): level of depth in the hierarchy.
 
     Returns:
         list of circlify.Output as value for element of data.
 
     """
     all_circles = []
-    if data is None:
+    if not data:
         return all_circles
-    packed = pack_A1_0([elem.datum for elem in data])
+    circles = _handle(data, 1, fields)
+    packed = pack_A1_0([sd.datum for sd in circles])
     enclosure = enclose(packed)
-    if enclosure is None:
-        enclosure = target_enclosure
-    for circle, elem in zip(packed, data):
-        elem.circle = scale(circle, target_enclosure, enclosure)
-        if elem.ex and fields.children in elem.ex:
-            all_circles.append(_circlify_level(elem.ex[fields.children],
-                                               elem.circle, fields))
-    return all_circles + data
+    assert enclosure is not None
+    for circle, inner_circle in zip(circles, packed):
+        circle.level = level
+        circle.circle = scale(inner_circle, target_enclosure, enclosure)
+        if circle.ex and fields.children in circle.ex:
+            all_circles += _circlify_level(circle.ex[fields.children],
+                                           circle.circle, fields, level + 1)
+        all_circles.append(circle)
+    return all_circles
 
 
 def _flatten(elements, flattened):
@@ -489,10 +498,9 @@ def circlify(data, target_enclosure=None, show_enclosure=False,
 
     """
     fields = FieldNames(id=id_field, datum=datum_field, children=children_field)
-    elements = _handle(data, 1, fields)
     if target_enclosure is None:
-        target_enclosure = _Circle(0.0, 0.0, 1.0)
-    all_circles = _circlify_level(elements, target_enclosure, fields)
+        target_enclosure = Circle(level=0, x=0.0, y=0.0, r=1.0)
+    all_circles = _circlify_level(data, target_enclosure, fields)
     if show_enclosure:
-        all_circles.append(Circle(0, None, circle=target_enclosure))
+        all_circles.append(target_enclosure)
     return sorted(all_circles)

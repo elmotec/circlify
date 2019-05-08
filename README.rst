@@ -76,19 +76,37 @@ The variable `circles` contains (last one is the enclosure):
 
 .. code:: python
 
-  [circ.Circle(x=0.35776879346704843, y=-0.13064957525245907, r=0.39529216048201216),
-   circ.Circle(x=-0.411432317820337, y=-0.13064957525245907, r=0.3739089508053733),
-   circ.Circle(x=-0.04661299415374866, y=0.4678014425767657, r=0.32697389223002427),
-   circ.Circle(x=-0.045884607890591435, y=-0.6977206243364218, r=0.3007722353441051),
-   circ.Circle(x=-0.6132109517981927, y=0.4490810687795324, r=0.23993324126007678),
-   circ.Circle(x=0.48296614887228806, y=0.4541723195782383, r=0.20278059970175755),
-   circ.Circle(x=0.3252787490004198, y=0.7776370388468007, r=0.15707317711577193),
-   circ.Circle(x=-0.40283175658099674, y=0.7512387781681531, r=0.12824971207048294),
-   circ.Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069),
-   circ.Circle(x=0.0, y=0.0, r=1.0)]
+TODO
+
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
 
 .. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
+
+Starting with version 0.10, circlify also handle hierarchical input so that:
+
+.. code:: python
+
+  import circlify as circ
+
+  data = [0.05, {'id': 'a2', 'datum': 0.05},
+          {'id': 'a0', 'datum': 0.8, 'children': [0.3, 0.2, 0.2, 0.1], },
+          {'id': 'a1', 'datum': 0.1, 'children':
+            [ {'id': 'a1_1', 'datum': 0.05}, {'datum': 0.04}, 0.01],},
+        ]
+  circles = circ.circlify(data, with_enclosure=True)
+
+
+returns:
+
+.. code:: python
+
+TODO
+
+
+A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
+
+.. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_4.png
+   :alt: visualization of circlify nested circle packing for a hierarchical input.
 
