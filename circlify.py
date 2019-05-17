@@ -26,14 +26,13 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as pltp
 
-    def bubbles(circles, lim=None):
+    def bubbles(circles, labels, lim=None):
         """Debugging function displays circles with matplotlib."""
         fig, ax = plt.subplots(figsize=(8.0, 8.0))
-        for circle in circles:
+        for circle, label in zip(circles, labels):
             x, y, r = circle.circle
             ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
                                      linewidth=2, fill=False))
-            label = circle.datum
             ax.text(x, y, label)
         if lim is None:
             lim = max([max(abs(circle.circle.x) + circle.circle.r,
@@ -56,51 +55,39 @@ class Circle:
 
     """
 
-    __slots__ = ['level', 'datum', 'circle', 'ex']
+    __slots__ = ['circle', 'level', 'ex']
 
-    def __init__(self, level, datum=None, x=0.0, y=0.0, r=0.0, ex=None):
+    def __init__(self, x=0.0, y=0.0, r=1.0, level=1, ex=None):
         """Initialize Output data structure.
 
         Args:
-            level (int): depth level of the data where 0 is the root of the
-                hierarchy.
-            datum (float): value that used the size of the circle.
             x (float): x coordinate of the circle center.
             y (float): y coordinate of the circle center.
             r (float): radius of the circle.
+            level (int): depth level of the data for hierarchy representation
+                where 0 is the root of the hierarchy.
             ex (dict): additional data to be carried by the structure (e.g.
                 label, name, parent_id, ...)
 
         """
-        self.level = level
-        self.datum = datum
         self.circle = _Circle(x, y, r)
+        self.level = level
         self.ex = ex
-
-    @classmethod
-    def from_circle(kls, x=0.0, y=0.0, r=1.0):
-        """Constructs a Circle from _Circle attributes.
-
-        Eases the creation of Circle objects. The level is set to 1, datum and
-        ex are set to None.
-
-        """
-        return Circle(1, r, x, y, r)
-
 
     def __lt__(self, other):
         """Reversed level order, then normal ordering on datum."""
-        return (self.level, self.datum) < (other.level, other.datum)
+        return (self.level, self.r) < (other.level, other.r)
 
     def __eq__(self, other):
         """Compare level and datum. No order on id, children and circle."""
-        return (self.level, self.datum) == (other.level, other.datum)
+        return (self.level, self.circle, self.ex) == \
+               (other.level, other.circle, other.ex)
 
     def __repr__(self):
         """Representation of Output"""
-        return "{}(level={}, datum={}, x={}, y={}, r={}, ex={!r})".\
-            format(self.__class__.__name__, self.level, self.datum,
-                   self.x, self.y, self.r, self.ex)
+        return "{}(x={}, y={}, r={}, level={}, ex={!r})".\
+            format(self.__class__.__name__, self.x, self.y, self.r,
+                   self.level, self.ex)
 
     @property
     def x(self):
@@ -119,8 +106,6 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 _eps = sys.float_info.epsilon
-
-_Circle = collections.namedtuple('_Circle', ['x', 'y', 'r'])
 
 def distance(circle1, circle2):
     """Compute distance between 2 cirlces."""
@@ -423,13 +408,14 @@ def _handle(data, level, fields=None):
     child_field = fields.children if fields.children else 'children'
     elements = []
     for datum in data:
-        try:  # try to leverage element as a numeric value.
-            elements.append(Circle(level, datum + 0, None))
-        except TypeError:  # if it fails, assume dict.
-            if not isinstance(datum, dict):
-                raise TypeError('dict or numeric value expected')
+        if isinstance(datum, dict):
             value = datum[datum_field]
-            elements.append(Circle(level, value, ex=datum))
+            elements.append(Circle(r=value + 0, level=level, ex=datum))
+        else:
+            try:
+                elements.append(Circle(r=datum + 0, level=level))
+            except TypeError:  # if it fails, assume dict.
+                raise TypeError('dict or numeric value expected')
     return sorted(elements, reverse=True)
 
 
@@ -453,7 +439,7 @@ def _circlify_level(data, target_enclosure, fields, level=1):
     if not data:
         return all_circles
     circles = _handle(data, 1, fields)
-    packed = pack_A1_0([sd.datum for sd in circles])
+    packed = pack_A1_0([circle.r for circle in circles])
     enclosure = enclose(packed)
     assert enclosure is not None
     for circle, inner_circle in zip(circles, packed):

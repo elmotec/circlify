@@ -72,11 +72,31 @@ Example
   circles = circ.circlify(data, with_enclosure=True)
 
 
-The variable `circles` contains (last one is the enclosure):
+The variable `circles` contains (level 0 is the enclosure):
 
 .. code:: python
 
-TODO
+    [
+        circ.Circle(x=0.0, y=0.0, r=1.0, level=0),
+        circ.Circle(x=0.09222041925800777, y=0.8617116738294696,
+                    r=0.09068624109026069),
+        circ.Circle(x=-0.40283175658099674, y=0.7512387781681531,
+                    r=0.12824971207048294),
+        circ.Circle(x=0.3252787490004198, y=0.7776370388468007,
+                    r=0.15707317711577193),
+        circ.Circle(x=0.48296614887228806, y=0.4541723195782383,
+                    r=0.20278059970175755),
+        circ.Circle(x=-0.6132109517981927, y=0.4490810687795324,
+                    r=0.23993324126007678),
+        circ.Circle(x=-0.045884607890591435, y=-0.6977206243364218,
+                    r=0.3007722353441051),
+        circ.Circle(x=-0.04661299415374866, y=0.4678014425767657,
+                    r=0.32697389223002427),
+        circ.Circle(x=-0.411432317820337, y=-0.13064957525245907,
+                    r=0.3739089508053733),
+        circ.Circle(x=0.35776879346704843, y=-0.13064957525245907,
+                    r=0.39529216048201216),
+    ]
 
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
@@ -102,7 +122,37 @@ returns:
 
 .. code:: python
 
-TODO
+    [
+        circ.Circle(level=0, r=1.0),
+        circ.Circle(x=-0.565803075997749, y=0.41097786651145324,
+                    r=0.18469903125906464),
+        circ.Circle(x=-0.3385727489559141, y=0.7022188441650276,
+                    r=0.18469903125906464, ex={'id': 'a2', 'datum': 0.05}),
+        circ.Circle(x=-0.7387961250362587, r=0.2612038749637415,
+                    ex={'id': 'a1', 'datum': 0.1,
+                        'children': [{'id': 'a1_1', 'datum': 0.05},
+                                     {'datum': 0.04},
+                                     {'id': 'a1_2', 'datum': 0.01}]}),
+        circ.Circle(x=0.2612038749637414, r=0.7387961250362586,
+                    ex={'id': 'a0', 'datum': 0.8,
+                        'children': [0.3, 0.2, 0.2, 0.1]}),
+        circ.Circle(level=2, x=-0.7567888163564136,
+                    y=0.14087823651338607, r=0.0616618704777984,
+                    ex={'id': 'a1_2', 'datum': 0.01}),
+        circ.Circle(level=2, x=-0.8766762590444033, y=0.0,
+                    r=0.1233237409555968,
+                    ex={'datum': 0.04}),
+        circ.Circle(level=2, ex={'id': 'a1_1', 'datum': 0.05},
+                    x=-0.6154723840806618, y=0.0, r=0.13788013400814464),
+        circ.Circle(level=2, x=0.6664952237042423,
+                    y=0.3369290873460549, r=0.2117455702848763),
+        circ.Circle(level=2, x=-0.11288314691830154,
+                    y=-0.230392881357073, r=0.2994534572692975),
+        circ.Circle(level=2, x=0.15631936804871832,
+                    y=0.30460197676548245, r=0.2994534572692975),
+        circ.Circle(level=2, x=0.5533243963620484,
+                    y=-0.230392881357073, r=0.36675408601105247),
+    ]
 
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
@@ -110,3 +160,6 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 .. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_4.png
    :alt: visualization of circlify nested circle packing for a hierarchical input.
 
+Note that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
+For instance: circles _a1_1_ and _a2_ both have a value of 0.05, yet _a1_1_ is smaller than _a2_ because it is fitted within its parent circle one level below the level of _a2_.
+In other words, the level 1 circles _a1_ and _a2_ are both proportional to their value but _a1_1_ is proportional to the values on level 2 witin _a1_, not to _a2_.
