@@ -160,6 +160,6 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 .. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_4.png
    :alt: visualization of circlify nested circle packing for a hierarchical input.
 
-Note that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
-For instance: circles _a1_1_ and _a2_ both have a value of 0.05, yet _a1_1_ is smaller than _a2_ because it is fitted within its parent circle one level below the level of _a2_.
-In other words, the level 1 circles _a1_ and _a2_ are both proportional to their value but _a1_1_ is proportional to the values on level 2 witin _a1_, not to _a2_.
+*Note* that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
+For instance: circles *a1_1* and *a2* both have a value of 0.05, yet *a1_1* is smaller than *a2* because *a1_1* is fitted within its parent circle *a1* one level below the level of *a2*.
+In other words, the level 1 circles *a1* and *a2* are both proportional to their respective values but *a1_1* is proportional to the values on level 2 witin *a1*.
