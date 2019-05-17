@@ -3,6 +3,7 @@
 
 """Tests for circlify"""
 
+import sys
 import unittest
 
 import circlify as circ
@@ -343,10 +344,17 @@ class MultiLevelInputTestCase(TestCaseWithDisplay):
         self.assertEqual(expected, actual)
 
     def test_missing_datum_value(self):
-        """Missing data should generate an exception with key looked up."""
+        """Missing data generates KeyError."""
+        with self.assertRaises(KeyError):
+            circ.circlify([{'ex':' Missing value'}])
+
+    @unittest.skipIf(sys.version_info < (3, 0),
+                     'assertRaisesRegex not supported')
+    def test_missing_datum_value(self):
+        """Missing data generates KeyError with correct key name."""
         datum_field = 'value'
         with self.assertRaisesRegex(KeyError, datum_field):
-            circ.circlify([{'ex':' Missing value'}], datum_field=datum_field)
+            circ.circlify([{'ex': ' Missing value'}], datum_field=datum_field)
 
 
 class HedgeTestCase(unittest.TestCase):
