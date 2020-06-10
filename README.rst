@@ -69,7 +69,7 @@ Example
   import circlify as circ
 
   data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
-  circles = circ.circlify(data, with_enclosure=True)
+  circles = circ.circlify(data, show_enclosure=True)
 
 
 The variable `circles` contains (level 0 is the enclosure):
@@ -115,7 +115,7 @@ Starting with version 0.10, circlify also handle hierarchical input so that:
           {'id': 'a1', 'datum': 0.1, 'children':
             [ {'id': 'a1_1', 'datum': 0.05}, {'datum': 0.04}, 0.01],},
         ]
-  circles = circ.circlify(data, with_enclosure=True)
+  circles = circ.circlify(data, show_enclosure=True)
 
 
 returns:
