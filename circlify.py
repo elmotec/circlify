@@ -26,9 +26,23 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as pltp
 
-    def bubbles(circles, labels, lim=None):
+    def get_default_label(count, circle):
+        """Generates a default label."""
+        if circle.ex and 'id' in circle.ex:
+            label = str(circle.ex['id'])
+        elif circle.ex and 'datum' in circle.ex:
+            label = circle.ex['datum']
+        elif circle.ex:
+            label = str(circle.ex)
+        else:
+            label = '#' + str(count)
+        return label
+
+    def bubbles(circles, labels=None, lim=None):
         """Debugging function displays circles with matplotlib."""
         fig, ax = plt.subplots(figsize=(8.0, 8.0))
+        if not labels:
+            labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         for circle, label in zip(circles, labels):
             x, y, r = circle.circle
             ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
@@ -413,7 +427,7 @@ def _handle(data, level, fields=None):
             elements.append(Circle(r=value + 0, level=level, ex=datum))
         else:
             try:
-                elements.append(Circle(r=datum + 0, level=level))
+                elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
             except TypeError:  # if it fails, assume dict.
                 raise TypeError('dict or numeric value expected')
     return sorted(elements, reverse=True)
