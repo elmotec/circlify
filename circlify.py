@@ -149,11 +149,11 @@ def get_intersection(circle1, circle2):
         log.debug('no solution, the circles are separate: %s, %s',
                   circle1, circle2)
         return None, None
-    if d < abs(r1 - r2):
+    if 1e-9 > d - abs(r1 - r2):
         log.debug('no solution, circles contained within each other: %s, %s',
                   circle1, circle2)
         return None, None
-    if d == 0 and r1 == r2:
+    if math.isclose(d, 0, abs_tol=1e-9) and math.isclose(r1, r2):
         log.debug('no solution, circles are coincident: %s, %s',
                   circle1, circle2)
         return None, None
