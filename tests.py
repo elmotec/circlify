@@ -622,10 +622,11 @@ class GetIntersectionTestCase(unittest.TestCase):
         hst.floats(),
         hst.floats(),
     )
-    def test_hypothesis(self, x1, y1, r1, x2, y2, r2):
+    def test_edge_cases(self, x1, y1, r1, x2, y2, r2):
+        """Edge cases do not cause exceptions."""
         c1 = circ.Circle(x=x1, y=y1, r=r1)
         c2 = circ.Circle(x=x2, y=y2, r=r2)
-        circ.get_intersection(c1, c2)
+        self.assertIsNotNone(circ.get_intersection(c1, c2))
 
 
 if __name__ == "__main__":
