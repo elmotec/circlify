@@ -24,7 +24,6 @@ __version__ = '0.11.0'
 
 try:
     import matplotlib.pyplot as plt
-    import matplotlib.patches as pltp
 
     def get_default_label(count, circle):
         """Generates a default label."""
@@ -45,8 +44,8 @@ try:
             labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         for circle, label in zip(circles, labels):
             x, y, r = circle.circle
-            ax.add_patch(pltp.Circle((x, y), r, alpha=0.2,
-                                     linewidth=2, fill=False))
+            ax.add_patch(plt.Circle((x, y), r, alpha=0.2,
+                                    linewidth=2, fill=False))
             ax.text(x, y, label)
         if lim is None:
             lim = max([max(abs(circle.circle.x) + circle.circle.r,
