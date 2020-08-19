@@ -1,5 +1,5 @@
 # Required for tests
 coverage
-python-coveralls
+coveralls
 hypothesis
 
