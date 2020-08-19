@@ -103,6 +103,10 @@ class Circle:
             format(self.__class__.__name__, self.x, self.y, self.r,
                    self.level, self.ex)
 
+    def __iter__(self):
+        """Convenience function to unpack circle in triple (x, y, r)"""
+        return [self.x, self.y, self.r].__iter__()
+
     @property
     def x(self):
         return self.circle.x
@@ -145,20 +149,24 @@ def get_intersection(circle1, circle2):
     x2, y2, r2 = circle2
     dx, dy = x2 - x1, y2 - y1
     d = math.sqrt(dx * dx + dy * dy)
-    if d > r1 + r2:
-        log.debug('no solution, the circles are separate: %s, %s',
-                  circle1, circle2)
+    # Protect this part of the algo with try/except because edge cases
+    # can lead to divizion by 0 or sqrt of negative numbers. Those indicate
+    # that no intersection can be found and the debug log will show more info.
+    try:
+        a = (r1 * r1 - r2 * r2 + d * d) / (2 * d)
+        h = math.sqrt(r1 * r1 - a * a)
+    except (ValueError, ZeroDivisionError):
+        eps = 1e-9
+        if d > r1 + r2:
+            log.debug('no solution, the circles are separate: %s, %s',
+                      circle1, circle2)
+        if d < abs(r1 - r2) + eps:
+            log.debug('no solution, circles contained within each other: %s, %s',
+                      circle1, circle2)
+        if math.isclose(d, 0, abs_tol=eps) and math.isclose(r1, r2, rel_tol=0.0, abs_tol=eps):
+            log.debug('no solution, circles are coincident: %s, %s',
+                      circle1, circle2)
         return None, None
-    if 1e-9 > d - abs(r1 - r2):
-        log.debug('no solution, circles contained within each other: %s, %s',
-                  circle1, circle2)
-        return None, None
-    if math.isclose(d, 0, abs_tol=1e-9) and math.isclose(r1, r2):
-        log.debug('no solution, circles are coincident: %s, %s',
-                  circle1, circle2)
-        return None, None
-    a = (r1 * r1 - r2 * r2 + d * d) / (2 * d)
-    h = math.sqrt(r1 * r1 - a * a)
     xm = x1 + a * dx / d
     ym = y1 + a* dy / d
     xs1 = xm + h * dy / d
