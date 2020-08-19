@@ -587,14 +587,12 @@ class GetIntersectionTestCase(unittest.TestCase):
 
         """
         c1 = circ._Circle(
-                x=-0.005574001032652584,
-                y=0.10484176298731643,
-                r=0.05662982038967889)
+            x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889
+        )
         c2 = circ._Circle(
-                x=0.029345054623395653,
-                y=0.06025929883988402,
-                r=2.220446049250313e-15)
-        self.assertEqual(circ.get_intersection(c1 ,c2), (None,None))
+            x=0.029345054623395653, y=0.06025929883988402, r=2.220446049250313e-15
+        )
+        self.assertEqual(circ.get_intersection(c1, c2), (None, None))
 
     def test_small_circle_that_does_intersect(self):
         """Testing for small circle that can be computed
@@ -604,16 +602,16 @@ class GetIntersectionTestCase(unittest.TestCase):
 
         """
         c1 = circ._Circle(
-                x=-0.005574001032652584,
-                y=0.10484176298731643,
-                r=0.05662982038967889)
-        c2 = circ._Circle(
-                x=0.029345054623395653,
-                y=0.06025929883988402,
-                r=1.0e-09)
-        self.assertEqual(circ.get_intersection(c1 ,c2),
-                         ((0.029345053725419824, 0.06025929813654767),
-                          (0.029345055521371476, 0.06025929954322038)))
+            x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889
+        )
+        c2 = circ._Circle(x=0.029345054623395653, y=0.06025929883988402, r=1.0e-09)
+        self.assertEqual(
+            circ.get_intersection(c1, c2),
+            (
+                (0.029345053725419824, 0.06025929813654767),
+                (0.029345055521371476, 0.06025929954322038),
+            ),
+        )
 
     def test_degenerate_inner_completely_inside_outer_circle(self):
         """Testing case where degenerate inner is completely inside the outer circle."""
@@ -621,8 +619,14 @@ class GetIntersectionTestCase(unittest.TestCase):
         c2 = circ.Circle(0, 0, 1)
         self.assertEqual(circ.get_intersection(c1, c2), (None, None))
 
-    @h.given(hst.floats(), hst.floats(), hst.floats(),
-             hst.floats(), hst.floats(), hst.floats())
+    @h.given(
+        hst.floats(),
+        hst.floats(),
+        hst.floats(),
+        hst.floats(),
+        hst.floats(),
+        hst.floats(),
+    )
     def test_hypothesis(self, x1, y1, r1, x2, y2, r2):
         c1 = circ.Circle(x=x1, y=y1, r=r1)
         c2 = circ.Circle(x=x2, y=y2, r=r2)

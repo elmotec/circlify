@@ -19,7 +19,7 @@ import itertools
 import logging
 
 
-__version__ = '0.11.0'
+__version__ = "0.12.0"
 
 
 try:
@@ -27,14 +27,14 @@ try:
 
     def get_default_label(count, circle):
         """Generates a default label."""
-        if circle.ex and 'id' in circle.ex:
-            label = str(circle.ex['id'])
-        elif circle.ex and 'datum' in circle.ex:
-            label = circle.ex['datum']
+        if circle.ex and "id" in circle.ex:
+            label = str(circle.ex["id"])
+        elif circle.ex and "datum" in circle.ex:
+            label = circle.ex["datum"]
         elif circle.ex:
             label = str(circle.ex)
         else:
-            label = '#' + str(count)
+            label = "#" + str(count)
         return label
 
     def bubbles(circles, labels=None, lim=None):
@@ -44,22 +44,30 @@ try:
             labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         for circle, label in zip(circles, labels):
             x, y, r = circle.circle
-            ax.add_patch(plt.Circle((x, y), r, alpha=0.2,
-                                    linewidth=2, fill=False))
+            ax.add_patch(plt.Circle((x, y), r, alpha=0.2, linewidth=2, fill=False))
             ax.text(x, y, label)
         if lim is None:
-            lim = max([max(abs(circle.circle.x) + circle.circle.r,
-                           abs(circle.circle.y) + circle.circle.r)
-                       for circle in circles])
+            lim = max(
+                [
+                    max(
+                        abs(circle.circle.x) + circle.circle.r,
+                        abs(circle.circle.y) + circle.circle.r,
+                    )
+                    for circle in circles
+                ]
+            )
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()
+
+
 except ImportError:
     pass
 
 
-_Circle = collections.namedtuple('_Circle', ['x', 'y', 'r'])
-FieldNames = collections.namedtuple('Field', ['id', 'datum', 'children'])
+_Circle = collections.namedtuple("_Circle", ["x", "y", "r"])
+FieldNames = collections.namedtuple("Field", ["id", "datum", "children"])
+
 
 class Circle:
     """Hierarchy element.
@@ -68,7 +76,7 @@ class Circle:
 
     """
 
-    __slots__ = ['circle', 'level', 'ex']
+    __slots__ = ["circle", "level", "ex"]
 
     def __init__(self, x=0.0, y=0.0, r=1.0, level=1, ex=None):
         """Initialize Output data structure.
@@ -93,14 +101,17 @@ class Circle:
 
     def __eq__(self, other):
         """Compare level and datum. No order on id, children and circle."""
-        return (self.level, self.circle, self.ex) == \
-               (other.level, other.circle, other.ex)
+        return (self.level, self.circle, self.ex) == (
+            other.level,
+            other.circle,
+            other.ex,
+        )
 
     def __repr__(self):
         """Representation of Output"""
-        return "{}(x={}, y={}, r={}, level={}, ex={!r})".\
-            format(self.__class__.__name__, self.x, self.y, self.r,
-                   self.level, self.ex)
+        return "{}(x={}, y={}, r={}, level={}, ex={!r})".format(
+            self.__class__.__name__, self.x, self.y, self.r, self.level, self.ex
+        )
 
     def __iter__(self):
         """Convenience function to unpack circle in triple (x, y, r)"""
@@ -123,6 +134,7 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 _eps = sys.float_info.epsilon
+
 
 def distance(circle1, circle2):
     """Compute distance between 2 cirlces."""
@@ -157,17 +169,20 @@ def get_intersection(circle1, circle2):
     except (ValueError, ZeroDivisionError):
         eps = 1e-9
         if d > r1 + r2:
-            log.debug('no solution, the circles are separate: %s, %s',
-                      circle1, circle2)
+            log.debug("no solution, the circles are separate: %s, %s", circle1, circle2)
         if d < abs(r1 - r2) + eps:
-            log.debug('no solution, circles contained within each other: %s, %s',
-                      circle1, circle2)
-        if math.isclose(d, 0, abs_tol=eps) and math.isclose(r1, r2, rel_tol=0.0, abs_tol=eps):
-            log.debug('no solution, circles are coincident: %s, %s',
-                      circle1, circle2)
+            log.debug(
+                "no solution, circles contained within each other: %s, %s",
+                circle1,
+                circle2,
+            )
+        if math.isclose(d, 0, abs_tol=eps) and math.isclose(
+            r1, r2, rel_tol=0.0, abs_tol=eps
+        ):
+            log.debug("no solution, circles are coincident: %s, %s", circle1, circle2)
         return None, None
     xm = x1 + a * dx / d
-    ym = y1 + a* dy / d
+    ym = y1 + a * dy / d
     xs1 = xm + h * dy / d
     xs2 = xm - h * dy / d
     ys1 = ym - h * dx / d
@@ -223,14 +238,13 @@ def get_hole_degree(candidate, placed_circles, pc1, pc2):
         used to place the candidate and r_i the radius of the candidate.
 
     """
-    lsq = 0.
+    lsq = 0.0
     for pc in placed_circles:
         if pc1 is not None and pc1 == pc:
             continue
         if pc2 is not None and pc2 == pc:
             continue
-        lsq += math.sqrt((candidate.y - pc.y) ** 2.0 +
-                         (candidate.x - pc.x) ** 2.0)
+        lsq += math.sqrt((candidate.y - pc.y) ** 2.0 + (candidate.x - pc.x) ** 2.0)
     return -math.sqrt(lsq)
 
 
@@ -246,7 +260,7 @@ def pack_A1_0(data):
         list of circlify.Output.
 
     """
-    assert data == sorted(data, reverse=True), 'data must be sorted (desc)'
+    assert data == sorted(data, reverse=True), "data must be sorted (desc)"
     placed_circles = []
     for value in data:
         radius = math.sqrt(value)
@@ -264,11 +278,13 @@ def pack_A1_0(data):
             for cand in get_placement_candidates(radius, c1, c2, margin):
                 if cand is not None:
                     # Ignore candidates that overlap with any placed circle.
-                    other_placed_circles = [circ for circ in placed_circles
-                                            if circ not in [c1, c2]]
+                    other_placed_circles = [
+                        circ for circ in placed_circles if circ not in [c1, c2]
+                    ]
                     if other_placed_circles:
-                        min_dist = min([distance(pc, cand)
-                                        for pc in other_placed_circles])
+                        min_dist = min(
+                            [distance(pc, cand) for pc in other_placed_circles]
+                        )
                         if min_dist < -_eps:
                             continue
                     hd = get_hole_degree(cand, placed_circles, c1, c2)
@@ -276,7 +292,7 @@ def pack_A1_0(data):
                         mhd = hd
                         lead_candidate = cand
         if lead_candidate is None:
-            raise ValueError('cannot place circle for value %f', value)
+            raise ValueError("cannot place circle for value %f", value)
         placed_circles.append(lead_candidate)
     return placed_circles
 
@@ -294,12 +310,14 @@ def extendBasis(B, p):
     # If we get here then B must have at least two elements.
     for i in range(len(B) - 1):
         for j in range(i + 1, len(B)):
-            if enclosesNot(encloseBasis2(B[i], B[j]), p) and \
-                    enclosesNot(encloseBasis2(B[i], p), B[j]) and \
-                    enclosesNot(encloseBasis2(B[j], p), B[i]) and \
-                    enclosesWeakAll(encloseBasis3(B[i], B[j], p), B):
+            if (
+                enclosesNot(encloseBasis2(B[i], B[j]), p)
+                and enclosesNot(encloseBasis2(B[i], p), B[j])
+                and enclosesNot(encloseBasis2(B[j], p), B[i])
+                and enclosesWeakAll(encloseBasis3(B[i], B[j], p), B)
+            ):
                 return [B[i], B[j], p]
-    raise RuntimeError('If we get here then something is very wrong')
+    raise RuntimeError("If we get here then something is very wrong")
 
 
 def enclosesNot(a, b):
@@ -338,10 +356,10 @@ def encloseBasis2(a, b):
     x21 = x2 - x1
     y21 = y2 - y1
     r21 = r2 - r1
-    l = math.sqrt(x21 * x21 + y21 * y21);
-    return _Circle((x1 + x2 + x21 / l * r21) / 2,
-                  (y1 + y2 + y21 / l * r21) / 2,
-                  (l + r1 + r2) / 2)
+    l = math.sqrt(x21 * x21 + y21 * y21)
+    return _Circle(
+        (x1 + x2 + x21 / l * r21) / 2, (y1 + y2 + y21 / l * r21) / 2, (l + r1 + r2) / 2
+    )
 
 
 def encloseBasis3(a, b, c):
@@ -399,7 +417,7 @@ def enclose(circles):
     """
     B = []
     p, e = None, None
-    #random.shuffle(circles)
+    # random.shuffle(circles)
 
     n = len(circles)
     i = 0
@@ -424,9 +442,9 @@ def _handle(data, level, fields=None):
     """
     if fields is None:
         fields = FieldNames(None, None, None)
-    datum_field = fields.datum if fields.datum else 'datum'
-    id_field = fields.id if fields.id else 'id'
-    child_field = fields.children if fields.children else 'children'
+    datum_field = fields.datum if fields.datum else "datum"
+    id_field = fields.id if fields.id else "id"
+    child_field = fields.children if fields.children else "children"
     elements = []
     for datum in data:
         if isinstance(datum, dict):
@@ -436,7 +454,7 @@ def _handle(data, level, fields=None):
             try:
                 elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
             except TypeError:  # if it fails, assume dict.
-                raise TypeError('dict or numeric value expected')
+                raise TypeError("dict or numeric value expected")
     return sorted(elements, reverse=True)
 
 
@@ -467,8 +485,9 @@ def _circlify_level(data, target_enclosure, fields, level=1):
         circle.level = level
         circle.circle = scale(inner_circle, target_enclosure, enclosure)
         if circle.ex and fields.children in circle.ex:
-            all_circles += _circlify_level(circle.ex[fields.children],
-                                           circle.circle, fields, level + 1)
+            all_circles += _circlify_level(
+                circle.ex[fields.children], circle.circle, fields, level + 1
+            )
         all_circles.append(circle)
     return all_circles
 
@@ -484,8 +503,14 @@ def _flatten(elements, flattened):
     return flattened
 
 
-def circlify(data, target_enclosure=None, show_enclosure=False,
-             datum_field='datum', id_field='id', children_field='children'):
+def circlify(
+    data,
+    target_enclosure=None,
+    show_enclosure=False,
+    datum_field="datum",
+    id_field="id",
+    children_field="children",
+):
     """Pack and enclose circles whose radius is linked to the input data.
 
     Args:
