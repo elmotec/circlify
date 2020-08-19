@@ -10,7 +10,7 @@ python:
 
 install:
     - python setup.py --quiet install
-    - pip --quiet install coverage python-coveralls
+    - pip --quiet install -r test-requirements.txt
 
 script:
     - python setup.py --quiet test
