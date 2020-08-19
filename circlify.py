@@ -332,8 +332,8 @@ def enclosesWeak(a, b):
 
 
 def enclosesWeakAll(a, B):
-    for i in range(len(B)):
-        if not enclosesWeak(a, B[i]):
+    for bel in B:
+        if not enclosesWeak(a, bel):
             return False
     return True
 
