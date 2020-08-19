@@ -300,9 +300,9 @@ def extendBasis(B, p):
         return [p]
 
     # If we get here then B must have at least one element.
-    for i in range(len(B)):
-        if enclosesNot(p, B[i]) and enclosesWeakAll(encloseBasis2(B[i], p), B):
-            return [B[i], p]
+    for bel in B:
+        if enclosesNot(p, bel) and enclosesWeakAll(encloseBasis2(bel, p), B):
+            return [bel, p]
 
     # If we get here then B must have at least two elements.
     for i in range(len(B) - 1):

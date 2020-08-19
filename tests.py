@@ -81,7 +81,7 @@ class TestCaseWithDisplay(unittest.TestCase):
             if display_layout:
                 circ.bubbles(circles, labels)
         except AttributeError as err:
-            print("%s. Did you install matplotlib?".format(err))
+            print("{}. Did you install matplotlib?".format(err))
             raise
 
 
