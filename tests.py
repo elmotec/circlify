@@ -567,6 +567,18 @@ class HedgeTestCase(unittest.TestCase):
         )
         self.assertEqual(3, len(actual))
 
+class GetIntersectionTestCase(unittest.TestCase):
+    def test_one_contained_inside_other(self):
+        """Testing for numerical problems with floating point math"""
+        c1 = circ._Circle(
+                x=-0.005574001032652584,
+                y=0.10484176298731643,
+                r=0.05662982038967889)
+        c2 = circ._Circle(
+                x=0.029345054623395653,
+                y=0.06025929883988402,
+                r=2.220446049250313e-15)
+        self.assertEqual(circ.get_intersection(c1 ,c2), (None,None))
 
 if __name__ == "__main__":
     import logging
