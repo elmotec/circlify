@@ -45,6 +45,7 @@ class CircleTest(unittest.TestCase):
     def test_unpack(self):
         """Circle should unpack to tuples."""
         x, y, r = circ.Circle(1, 2, 3)
+        self.assertEqual((x, y, r), (1, 2, 3))
 
 
 class SpecialCases(unittest.TestCase):
@@ -80,7 +81,7 @@ class TestCaseWithDisplay(unittest.TestCase):
             if display_layout:
                 circ.bubbles(circles, labels)
         except AttributeError as err:
-            print("%s. %s".format(err, "Did you install matplotlib?"))
+            print("%s. Did you install matplotlib?".format(err))
             raise
 
 
@@ -301,31 +302,31 @@ class EnclosureScalingTestCase(unittest.TestCase):
 
     def test_simple_zoom(self):
         """Trivial zoom test when the enclosure is the same as the circle."""
-        input = circ._Circle(0, 0, 0.5)
+        input_ = circ._Circle(0, 0, 0.5)
         target = circ._Circle(0, 0, 1.0)
-        actual = circ.scale(input, target, input)
+        actual = circ.scale(input_, target, input_)
         self.assertEqual(target, actual)
 
     def test_simple_zoom_off_center(self):
         """Zoom test with off center circle equal to enclosure."""
-        input = circ._Circle(0.5, 0.5, 0.5)
+        input_ = circ._Circle(0.5, 0.5, 0.5)
         target = circ._Circle(0.5, 0.5, 1.0)
-        actual = circ.scale(input, target, input)
+        actual = circ.scale(input_, target, input_)
         self.assertEqual(target, actual)
 
     def test_simple_zoom_and_translation(self):
         """Pan and zoom test with off center circle equal to enclosure."""
-        input = circ._Circle(0.5, 0.5, 0.5)
+        input_ = circ._Circle(0.5, 0.5, 0.5)
         target = circ._Circle(-0.5, 0, 1.0)
-        actual = circ.scale(input, target, input)
+        actual = circ.scale(input_, target, input_)
         self.assertEqual(target, actual)
 
     def test_zoom_with_enclosure(self):
         """Zoom test with off center circle and difference enclosure"""
-        input = circ._Circle(1.0, 0.0, 1.0)
+        input_ = circ._Circle(1.0, 0.0, 1.0)
         enclosure = circ._Circle(0.0, 0.0, 2.0)
         target = circ._Circle(0.0, 0.0, 1.0)
-        actual = circ.scale(input, target, enclosure)
+        actual = circ.scale(input_, target, enclosure)
         expected = circ._Circle(0.5, 0.0, 0.5)
         self.assertEqual(expected, actual)
 

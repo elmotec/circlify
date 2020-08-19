@@ -38,7 +38,7 @@ try:  # pragma: no cover
 
     def bubbles(circles, labels=None, lim=None):
         """Debugging function displays circles with matplotlib."""
-        fig, ax = plt.subplots(figsize=(8.0, 8.0))
+        _, ax = plt.subplots(figsize=(8.0, 8.0))
         if not labels:
             labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         for circle, label in zip(circles, labels):
