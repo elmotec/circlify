@@ -12,17 +12,16 @@ https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
 
 """
 
-import sys
-import math
 import collections
 import itertools
 import logging
-
+import math
+import sys
 
 __version__ = "0.12.0"
 
 
-try:
+try:  # pragma: no cover
     import matplotlib.pyplot as plt
 
     def get_default_label(count, circle):
@@ -48,20 +47,18 @@ try:
             ax.text(x, y, label)
         if lim is None:
             lim = max(
-                [
-                    max(
-                        abs(circle.circle.x) + circle.circle.r,
-                        abs(circle.circle.y) + circle.circle.r,
-                    )
-                    for circle in circles
-                ]
+                max(
+                    abs(circle.circle.x) + circle.circle.r,
+                    abs(circle.circle.y) + circle.circle.r,
+                )
+                for circle in circles
             )
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()
 
 
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 
@@ -283,7 +280,7 @@ def pack_A1_0(data):
                     ]
                     if other_placed_circles:
                         min_dist = min(
-                            [distance(pc, cand) for pc in other_placed_circles]
+                            distance(pc, cand) for pc in other_placed_circles
                         )
                         if min_dist < -_eps:
                             continue
@@ -356,9 +353,11 @@ def encloseBasis2(a, b):
     x21 = x2 - x1
     y21 = y2 - y1
     r21 = r2 - r1
-    l = math.sqrt(x21 * x21 + y21 * y21)
+    l21 = math.sqrt(x21 * x21 + y21 * y21)
     return _Circle(
-        (x1 + x2 + x21 / l * r21) / 2, (y1 + y2 + y21 / l * r21) / 2, (l + r1 + r2) / 2
+        (x1 + x2 + x21 / l21 * r21) / 2,
+        (y1 + y2 + y21 / l21 * r21) / 2,
+        (l21 + r1 + r2) / 2,
     )
 
 
@@ -443,8 +442,6 @@ def _handle(data, level, fields=None):
     if fields is None:
         fields = FieldNames(None, None, None)
     datum_field = fields.datum if fields.datum else "datum"
-    id_field = fields.id if fields.id else "id"
-    child_field = fields.children if fields.children else "children"
     elements = []
     for datum in data:
         if isinstance(datum, dict):

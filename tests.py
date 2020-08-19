@@ -3,14 +3,11 @@
 
 """Tests for circlify"""
 
-import sys
 import unittest
 
+import circlify as circ
 import hypothesis as h
 import hypothesis.strategies as hst
-
-import circlify as circ
-
 
 # Set this variable to True to get a display of the layout (req matlplotlib)
 display_layout = False
@@ -23,7 +20,7 @@ def density(solution):
 
     """
     circ.circ.scale(solution, circ.Circle(0.0, 0.0, 1.0))
-    density = sum([c.r * c.r for c in solution if c.r < 1.0])
+    density = sum(c.r * c.r for c in solution if c.r < 1.0)
     return density
 
 
@@ -231,7 +228,7 @@ class GeometricSerieTestCase(TestCaseWithDisplay):
 
     def setUp(self):
         """Sets up the primes sequence 1, 2, ..."""
-        self.data = sorted([2 ** n for n in range(4, 12)], reverse=True)
+        self.data = sorted((2 ** n for n in range(4, 12)), reverse=True)
 
     def test_circlify(self):
         """Check the coordinates of the circles returned are expected."""
@@ -559,12 +556,10 @@ class MultiLevelInputTestCase(TestCaseWithDisplay):
         with self.assertRaises(KeyError):
             circ.circlify([{"ex": " Missing value"}])
 
-    @unittest.skipIf(sys.version_info < (3, 0), "assertRaisesRegex not supported")
-    def test_missing_datum_value(self):
+    def test_missing_datum_value_w_datum_field(self):
         """Missing data generates KeyError with correct key name."""
-        datum_field = "value"
-        with self.assertRaisesRegex(KeyError, datum_field):
-            circ.circlify([{"ex": " Missing value"}], datum_field=datum_field)
+        with self.assertRaisesRegex(KeyError, "value"):
+            circ.circlify([{"ex": " Missing value"}], datum_field="value")
 
 
 class HedgeTestCase(unittest.TestCase):
