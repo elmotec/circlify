@@ -3,3 +3,4 @@ matplotlib
 pyreadline
 pre-commit
 black
+wheel
