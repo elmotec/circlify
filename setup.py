@@ -15,7 +15,7 @@ setup(
     description="Circle packing algorithm for Python",
     long_description=readme,
     long_description_content_type="text/x-rst",
-    version="0.12.0",
+    version="0.12.1",
     author="Elmotec",
     author_email="elmotec@gmx.com",
     license="MIT",

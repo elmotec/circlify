@@ -18,7 +18,7 @@ import logging
 import math
 import sys
 
-__version__ = "0.12.0"
+__version__ = "0.12.1"
 
 
 try:  # pragma: no cover
