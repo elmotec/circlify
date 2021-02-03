@@ -57,8 +57,7 @@ The main function ``circlify`` is supported by a small data class ``circlify.Cir
 * (optional) A target enclosure where the packed circles should fit. It defaults to the unit circle (0, 0, 1).
 * (optional) A boolean indicating if the target enclosure should be appended to the output.
 
-The function returns a list of ``circlify.Circle`` objects, each one corresponding
-to the coordinates and radius of cirlces proportional to the corresponding input value.
+The function returns a list of ``circlify.Circle`` whose *area* is proportional to the corresponding input value.
 
 
 Example
