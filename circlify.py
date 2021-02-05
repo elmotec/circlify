@@ -36,26 +36,32 @@ try:  # pragma: no cover
             label = "#" + str(count)
         return label
 
-    def bubbles(circles, labels=None, lim=None):
+    def _bubbles(circles, labels, lim=None):
         """Debugging function displays circles with matplotlib."""
         _, ax = plt.subplots(figsize=(8.0, 8.0))
-        if not labels:
-            labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         for circle, label in zip(circles, labels):
-            x, y, r = circle.circle
+            x, y, r = circle
             ax.add_patch(plt.Circle((x, y), r, alpha=0.2, linewidth=2, fill=False))
             ax.text(x, y, label)
+        n = len(circles)
+        d = density(circles)
+        ax.set_title(f"{n} circles packed for density {d:.4f}")
         if lim is None:
             lim = max(
                 max(
-                    abs(circle.circle.x) + circle.circle.r,
-                    abs(circle.circle.y) + circle.circle.r,
+                    abs(circle.x) + circle.r,
+                    abs(circle.y) + circle.r,
                 )
                 for circle in circles
             )
         plt.xlim(-lim, lim)
         plt.ylim(-lim, lim)
         plt.show()
+
+    def bubbles(circles, labels=None, lim=None):
+        if not labels:
+            labels = [get_default_label(i, c) for i, c in enumerate(circles)]
+        return _bubbles([c.circle for c in circles], labels, lim)
 
 
 except ImportError:  # pragma: no cover
@@ -431,6 +437,21 @@ def enclose(circles):
     return e
 
 
+def density(circles):
+    """Computes the relative density of te packed circles.
+
+    Args:
+        circles: packed list of circles.
+
+    Return:
+        Compute the enclosure and calculates the relative area of the sum of the
+        inner cirlces to the area of the enclosure.
+
+    """
+    enclosure = enclose(circles)
+    return sum(c.r ** 2.0 for c in circles if c != enclosure) / enclosure.r ** 2.0
+
+
 def _handle(data, level, fields=None):
     """Converts possibly heterogeneous list of float or dict in list of Output.
 
@@ -508,7 +529,7 @@ def circlify(
     id_field="id",
     children_field="children",
 ):
-    """Pack and enclose circles whose radius is linked to the input data.
+    """Pack and enclose circles.
 
     Args:
         data: sorted (descending) array of values.
@@ -522,8 +543,9 @@ def circlify(
             element is a dict.
 
     Returns:
-        list of circlify.Circle sorted by ascending level (root to leaf) and
-        descending value (biggest circles first).
+        list of circlify.Circle whose *area* is proportional to the
+        corresponding input value.  The list is sorted by ascending level
+        (root to leaf) and descending value (biggest circles first).
 
     """
     fields = FieldNames(id=id_field, datum=datum_field, children=children_field)
