@@ -21,6 +21,12 @@ import sys
 __version__ = "0.12.1"
 
 
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
+
+_eps = sys.float_info.epsilon
+
+
 try:  # pragma: no cover
     import matplotlib.pyplot as plt
 
@@ -36,15 +42,20 @@ try:  # pragma: no cover
             label = "#" + str(count)
         return label
 
-    def _bubbles(circles, labels, lim=None):
+    def _bubbles(circles, labels=None, lim=None):
         """Debugging function displays circles with matplotlib."""
+        if not labels:
+            labels = range(len(circles))
         _, ax = plt.subplots(figsize=(8.0, 8.0))
         for circle, label in zip(circles, labels):
             x, y, r = circle
             ax.add_patch(plt.Circle((x, y), r, alpha=0.2, linewidth=2, fill=False))
             ax.text(x, y, label)
+        enclosure = enclose(circles)
         n = len(circles)
-        d = density(circles)
+        if enclosure in circles:
+            n = n - 1
+        d = density(circles, enclosure)
         ax.set_title(f"{n} circles packed for density {d:.4f}")
         if lim is None:
             lim = max(
@@ -133,12 +144,6 @@ class Circle:
         return self.circle.r
 
 
-log = logging.getLogger(__name__)
-log.addHandler(logging.NullHandler())
-
-_eps = sys.float_info.epsilon
-
-
 def distance(circle1, circle2):
     """Compute distance between 2 cirlces."""
     x1, y1, r1 = circle1
@@ -208,7 +213,7 @@ def get_placement_candidates(radius, c1, c2, margin):
         A pair of candidate cirlces where one or both value can be None.
 
     """
-    margin = 10.0 * sys.float_info.epsilon
+    margin = radius * _eps * 10.0
     ic1 = _Circle(c1.x, c1.y, c1.r + (radius + margin))
     ic2 = _Circle(c2.x, c2.y, c2.r + (radius + margin))
     i1, i2 = get_intersection(ic1, ic2)
@@ -223,36 +228,75 @@ def get_placement_candidates(radius, c1, c2, margin):
     return candidate1, candidate2
 
 
-def get_hole_degree(candidate, placed_circles, pc1, pc2):
+def get_hole_degree_euclid(candidate, circles):
     """Calculate the hole degree of a candidate circle.
-
-    Note pc1 and pc2 must not be used in the evaluation of the minimum
-    distance.
 
     Args:
         candidate: candidate circle.
-        placed_circles: sequence of circles already placed.
-        pc1: first placed circle used to place the candidate.
-        pc2: second placed circle used to place the candidate.
+        circles: sequence of circles.
 
     Returns:
-        hole degree defined as (1 - d_min / r_i) where d_min is a minimum
-        disance between the candidate and the circles other than the one
-        used to place the candidate and r_i the radius of the candidate.
+        Squared euclidian distance of the candidate to the circles in argument.
 
     """
-    lsq = 0.0
-    for pc in placed_circles:
-        if pc1 is not None and pc1 == pc:
-            continue
-        if pc2 is not None and pc2 == pc:
-            continue
-        lsq += math.sqrt((candidate.y - pc.y) ** 2.0 + (candidate.x - pc.x) ** 2.0)
-    return -math.sqrt(lsq)
+    return sum(distance(candidate, c) ** 2.0 for c in circles)
+
+
+def get_hole_degree_radius_w(candidate, circles):
+    """Calculate the hole degree of a candidate circle.
+
+    Args:
+        candidate: candidate circle.
+        circles: sequence of circles.
+
+    Returns:
+        Squared euclidian distance of the candidate to the circles in argument.
+        Each component of the distance is weighted by the inverse of the radius
+        of the other circle to tilt the choice towards bigger circles.
+
+    """
+    return sum(distance(candidate, c) * c.r for c in circles)
+
+
+def get_hole_degree_euclid_2(candidate, circles):
+    """Calculate the hole degree of a candidate circle.
+
+    Args:
+        candidate: candidate circle.
+        circles: sequence of circles.
+
+    Returns:
+        Squared euclidian distance of the candidate to the furthest 2 circles
+        in argument.
+
+    """
+    closest = sorted(distance(candidate, c) ** 2.0 for c in circles)
+    return sum(closest[-2:])
+
+
+def get_hole_degree_a1_0(candidate, circles):
+    """Calculate the hole degree of a candidate circle.
+
+    Args:
+        candidate: candidate circle.
+        circles: sequence of circles.
+
+    Returns:
+        minimum distance between the candidate and the circles in argument.
+
+    In the paper, the hole degree defined as (1 - d_min / r_i) where d_min is
+    a minimum disance between the candidate and the circles other than the one
+    used to place the candidate and r_i the radius of the candidate.
+
+    """
+    return min(distance(candidate, c) for c in circles)
+
+
+get_hole_degree = get_hole_degree_radius_w
 
 
 def pack_A1_0(data):
-    """Pack circles whose radius is linked to the input data.
+    """Pack circles whose area is proportional to the input data.
 
     This algorithm is based on the Huang et al. heuristic.
 
@@ -263,6 +307,9 @@ def pack_A1_0(data):
         list of circlify.Output.
 
     """
+    min_max_ratio = min(data) / max(data)
+    if min_max_ratio < _eps:
+        log.warning("min to max ratio is too low at %f and it could cause algorithm stability issues. Try to remove insignificant data", min_max_ratio)
     assert data == sorted(data, reverse=True), "data must be sorted (desc)"
     placed_circles = []
     for value in data:
@@ -278,22 +325,25 @@ def pack_A1_0(data):
         lead_candidate = None
         for (c1, c2) in itertools.combinations(placed_circles, 2):
             margin = float(_eps)
+            # Placed circles other than the 2 circles used to find the
+            # candidate placement.
+            other_circles = [c for c in placed_circles if c not in (c1, c2)]
             for cand in get_placement_candidates(radius, c1, c2, margin):
-                if cand is not None:
-                    # Ignore candidates that overlap with any placed circle.
-                    other_placed_circles = [
-                        circ for circ in placed_circles if circ not in [c1, c2]
-                    ]
-                    if other_placed_circles:
-                        min_dist = min(
-                            distance(pc, cand) for pc in other_placed_circles
-                        )
-                        if min_dist < -_eps:
-                            continue
-                    hd = get_hole_degree(cand, placed_circles, c1, c2)
-                    if mhd is None or hd > mhd:
-                        mhd = hd
-                        lead_candidate = cand
+                if cand is None:
+                    continue
+                if not other_circles:
+                    lead_candidate = cand
+                    break
+                # If overlaps with any, skip this candidate.
+                if any(distance(c, cand) < 0.0 for c in other_circles):
+                    continue
+                hd = get_hole_degree(cand, other_circles)
+                assert hd is not None, "hole degree should not be None!"
+                if mhd is None or hd < mhd:
+                    mhd = hd
+                    lead_candidate = cand
+                if abs(mhd) < margin:
+                    break
         if lead_candidate is None:
             raise ValueError("cannot place circle for value %f", value)
         placed_circles.append(lead_candidate)
@@ -320,7 +370,7 @@ def extendBasis(B, p):
                 and enclosesWeakAll(encloseBasis3(B[i], B[j], p), B)
             ):
                 return [B[i], B[j], p]
-    raise RuntimeError("If we get here then something is very wrong")
+    raise ValueError("If we get here then something is very wrong")
 
 
 def enclosesNot(a, b):
@@ -437,7 +487,7 @@ def enclose(circles):
     return e
 
 
-def density(circles):
+def density(circles, enclosure=None):
     """Computes the relative density of te packed circles.
 
     Args:
@@ -448,7 +498,8 @@ def density(circles):
         inner cirlces to the area of the enclosure.
 
     """
-    enclosure = enclose(circles)
+    if not enclosure:
+        enclosure = enclose(circles)
     return sum(c.r ** 2.0 for c in circles if c != enclosure) / enclosure.r ** 2.0
 
 
@@ -468,11 +519,15 @@ def _handle(data, level, fields=None):
         if isinstance(datum, dict):
             value = datum[datum_field]
             elements.append(Circle(r=value + 0, level=level, ex=datum))
-        else:
-            try:
-                elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
-            except TypeError:  # if it fails, assume dict.
-                raise TypeError("dict or numeric value expected")
+            continue
+        if datum <= 0.0:
+            raise ValueError("input data must be positive. Found %f", datum)
+        if datum <= _eps:
+            log.warning("input data %f is too small and could generate stability issues. Can you scale the data set up or drop insignificant elements?", datum)
+        try:
+            elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
+        except TypeError:  # if it fails, assume dict.
+            raise TypeError("dict or numeric value expected")
     return sorted(elements, reverse=True)
 
 
