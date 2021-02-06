@@ -107,7 +107,7 @@ class DensityThresholdTestCase(DisplayedTestCase):
     """Simple test cases that checks the density of the circle placement."""
 
     def setUp(self):
-        self.density_threshold = 0.6
+        self.density_threshold = 0.63
 
     def test_prime_series(self):
         """Check the coordinates of the circles returned are expected."""
@@ -189,15 +189,13 @@ class MultiInstanceTestCase(unittest.TestCase):
             "NR60-1": [35, 35, 35, 36, 37, 37, 38, 38, 39, 39, 40, 41, 41, 42, 42, 42, 42, 42, 44, 44, 45, 45, 46, 46, 47, 48, 48, 49, 50, 50, 54, 54, 57, 57, 59, 60, 60, 71, 71, 71, 72, 72, 74, 74, 76, 77, 77, 79, 79, 80, 82, 82, 85, 86, 89, 90, 94, 95, 96, 100, 522.93, ],
         }
         # fmt: on
-        sum_actual_d, sum_target_d = 0.0, 0.0
+        actual_d, target_d = [], []
         for (name, data) in instances.items():
             data, target_r = data[:-1], data[-1]
             solution = circ.circlify(data)
-            actual_d = circ.density([c.circle for c in solution])
-            target_d = sum(d ** 2.0 for d in data) / target_r ** 2.0
-            sum_actual_d += actual_d
-            sum_target_d += target_d
-        self.assertGreater(sum_actual_d, sum_target_d * 0.8)
+            actual_d.append(circ.density([c.circle for c in solution]))
+            target_d.append(sum(d ** 2.0 for d in data) / target_r ** 2.0)
+        self.assertGreater(sum(actual_d), sum(target_d) * 0.83)
 
 
 class EnclosureScalingTestCase(unittest.TestCase):
