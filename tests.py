@@ -68,7 +68,7 @@ class SpecialCases(unittest.TestCase):
 
     def test_tiny_values_warning(self):
         """Tiny values cause stability issues and should generate a warning."""
-        with self.assertLogs(circ.__name__, level='WARNING') as context:
+        with self.assertLogs(circ.__name__, level="WARNING") as context:
             try:
                 _ = circ.circlify([5e-324, 5e-324, 5e-324])
             except ValueError:
@@ -77,7 +77,7 @@ class SpecialCases(unittest.TestCase):
 
     def test_low_min_max_ratio_warning(self):
         """Low min to max ratio in the data generates should generate a warning."""
-        with self.assertLogs(circ.log, level='WARNING') as context:
+        with self.assertLogs(circ.log, level="WARNING") as context:
             try:
                 _ = circ.circlify([1.0, 1.0, 2.9514790517935283e20])
             except ValueError:
@@ -153,7 +153,7 @@ class MultiInstanceTestCase(unittest.TestCase):
     )
     def test_hypothesis(self, data):
         actual = circ.circlify(data, show_enclosure=True)
-        self.assertGreaterEqual(density(actual), 0.5, f"list is {data}")
+        self.assertGreaterEqual(density(actual), 0.5, str(data))
 
     def test_output_performance(self):
         """Test output peformance vs paper examples.

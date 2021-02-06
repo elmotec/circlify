@@ -309,7 +309,10 @@ def pack_A1_0(data):
     """
     min_max_ratio = min(data) / max(data)
     if min_max_ratio < _eps:
-        log.warning("min to max ratio is too low at %f and it could cause algorithm stability issues. Try to remove insignificant data", min_max_ratio)
+        log.warning(
+            "min to max ratio is too low at %f and it could cause algorithm stability issues. Try to remove insignificant data",
+            min_max_ratio,
+        )
     assert data == sorted(data, reverse=True), "data must be sorted (desc)"
     placed_circles = []
     for value in data:
@@ -523,7 +526,10 @@ def _handle(data, level, fields=None):
         if datum <= 0.0:
             raise ValueError("input data must be positive. Found %f", datum)
         if datum <= _eps:
-            log.warning("input data %f is too small and could generate stability issues. Can you scale the data set up or drop insignificant elements?", datum)
+            log.warning(
+                "input data %f is too small and could generate stability issues. Can you scale the data set up or drop insignificant elements?",
+                datum,
+            )
         try:
             elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
         except TypeError:  # if it fails, assume dict.
