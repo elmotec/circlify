@@ -4,3 +4,4 @@ pyreadline
 pre-commit
 black
 wheel
+hypothesis
