@@ -56,7 +56,8 @@ try:  # pragma: no cover
         if enclosure in circles:
             n = n - 1
         d = density(circles, enclosure)
-        ax.set_title(f"{n} circles packed for density {d:.4f}")
+        title = "{} circles packed for density {:.4f}".format(n, d)
+        ax.set_title(title)
         if lim is None:
             lim = max(
                 max(
@@ -348,7 +349,7 @@ def pack_A1_0(data):
                 if abs(mhd) < margin:
                     break
         if lead_candidate is None:
-            raise ValueError("cannot place circle for value %f", value)
+            raise ValueError("cannot place circle for value " + str(value))
         placed_circles.append(lead_candidate)
     return placed_circles
 
@@ -524,7 +525,7 @@ def _handle(data, level, fields=None):
             elements.append(Circle(r=value + 0, level=level, ex=datum))
             continue
         if datum <= 0.0:
-            raise ValueError("input data must be positive. Found %f", datum)
+            raise ValueError("input data must be positive. Found " + str(datum))
         if datum <= _eps:
             log.warning(
                 "input data %f is too small and could generate stability issues. Can you scale the data set up or drop insignificant elements?",
