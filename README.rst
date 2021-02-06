@@ -25,7 +25,7 @@ circlify
 
 Pure Python implementation of circle packing layout algorithm.
 
-Circles are first arranged via a version of A1.0 by Huang et al (see https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf for details) and then enclosed in a circle created around them using Matoušek-Sharir-Welzl algorithm used in d3js (see https://beta.observablehq.com/@mbostock/miniball, http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf, and https://github.com/d3/d3-hierarchy/blob/master/src/pack/enclose.js)
+Circles are first arranged with a euristic inspired by the A1.0 of [Huang-2006]_, then enclosed in a circle created around them using [MSW-1996]_ algorithm used in [Bostock-2017]_.  I hope to implement A1.5 at some point in the future but the results are good enough for my use case.
 
 Installation
 ------------
@@ -70,15 +70,15 @@ Example
     >>> circles = circ.circlify([19, 17, 13, 11, 7, 5, 3, 2, 1], show_enclosure=True)
     >>> pp(circles)
     [Circle(x=0.0, y=0.0, r=1.0, level=0, ex=None),
-     Circle(x=0.09222041925800777, y=0.8617116738294696, r=0.09068624109026069, level=1, ex={'datum': 1}),
-     Circle(x=-0.40283175658099674, y=0.7512387781681531, r=0.12824971207048294, level=1, ex={'datum': 2}),
-     Circle(x=0.3252787490004198, y=0.7776370388468007, r=0.15707317711577193, level=1, ex={'datum': 3}),
-     Circle(x=0.48296614887228806, y=0.4541723195782383, r=0.20278059970175755, level=1, ex={'datum': 5}),
-     Circle(x=-0.6132109517981927, y=0.4490810687795324, r=0.23993324126007678, level=1, ex={'datum': 7}),
-     Circle(x=-0.045884607890591435, y=-0.6977206243364218, r=0.3007722353441051, level=1, ex={'datum': 11}),
-     Circle(x=-0.04661299415374866, y=0.4678014425767657, r=0.32697389223002427, level=1, ex={'datum': 13}),
-     Circle(x=-0.411432317820337, y=-0.13064957525245907, r=0.3739089508053733, level=1, ex={'datum': 17}),
-     Circle(x=0.35776879346704843, y=-0.13064957525245907, r=0.39529216048201216, level=1, ex={'datum': 19})]
+     Circle(x=-0.633232604611031, y=-0.47732413442115296, r=0.09460444572843042, level=1, ex={'datum': 1}),
+     Circle(x=-0.7720311587589236, y=0.19946176418549022, r=0.13379089020993573, level=1, ex={'datum': 2}),
+     Circle(x=-0.43168871955473165, y=-0.6391381648617572, r=0.16385970662353394, level=1, ex={'datum': 3}),
+     Circle(x=0.595447603036083, y=0.5168251295666467, r=0.21154197162246005, level=1, ex={'datum': 5}),
+     Circle(x=-0.5480911056188739, y=0.5115139053491098, r=0.2502998363185337, level=1, ex={'datum': 7}),
+     Circle(x=0.043747233552068686, y=-0.6848366902134195, r=0.31376744998074435, level=1, ex={'datum': 11}),
+     Circle(x=0.04298737651230445, y=0.5310431146935967, r=0.34110117996070605, level=1, ex={'datum': 13}),
+     Circle(x=-0.3375943908160698, y=-0.09326467617622711, r=0.39006412239133215, level=1, ex={'datum': 17}),
+     Circle(x=0.46484095011516874, y=-0.09326467617622711, r=0.4123712185399064, level=1, ex={'datum': 19})]
 
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
@@ -102,17 +102,17 @@ Starting with version 0.10, circlify also handle hierarchical input so that:
     >>> circles = circ.circlify(data, show_enclosure=True)
     >>> pp(circles)
     [Circle(x=0.0, y=0.0, r=1.0, level=0, ex=None),
-     Circle(x=-0.565803075997749, y=0.41097786651145324, r=0.18469903125906464, level=1, ex={'datum': 0.05}),
-     Circle(x=-0.3385727489559141, y=0.7022188441650276, r=0.18469903125906464, level=1, ex={'id': 'a2', 'datum': 0.05}),
+     Circle(x=-0.5658030759977484, y=0.4109778665114514, r=0.18469903125906464, level=1, ex={'datum': 0.05}),
+     Circle(x=-0.5658030759977484, y=-0.4109778665114514, r=0.18469903125906464, level=1, ex={'id': 'a2', 'datum': 0.05}),
      Circle(x=-0.7387961250362587, y=0.0, r=0.2612038749637415, level=1, ex={'id': 'a1', 'datum': 0.1, 'children': [{'id': 'a1_1', 'datum': 0.05}, {'datum': 0.04}, 0.01]}),
      Circle(x=0.2612038749637414, y=0.0, r=0.7387961250362586, level=1, ex={'id': 'a0', 'datum': 0.8, 'children': [0.3, 0.2, 0.2, 0.1]}),
-     Circle(x=-0.7567888163564136, y=0.14087823651338607, r=0.0616618704777984, level=2, ex={'datum': 0.01}),
+     Circle(x=-0.7567888163564135, y=0.1408782365133844, r=0.0616618704777984, level=2, ex={'datum': 0.01}),
      Circle(x=-0.8766762590444033, y=0.0, r=0.1233237409555968, level=2, ex={'datum': 0.04}),
      Circle(x=-0.6154723840806618, y=0.0, r=0.13788013400814464, level=2, ex={'id': 'a1_1', 'datum': 0.05}),
-     Circle(x=0.6664952237042423, y=0.3369290873460549, r=0.2117455702848763, level=2, ex={'datum': 0.1}),
-     Circle(x=-0.11288314691830154, y=-0.230392881357073, r=0.2994534572692975, level=2, ex={'datum': 0.2}),
-     Circle(x=0.15631936804871832, y=0.30460197676548245, r=0.2994534572692975, level=2, ex={'datum': 0.2}),
-     Circle(x=0.5533243963620484, y=-0.230392881357073, r=0.36675408601105247, level=2, ex={'datum': 0.3})]
+     Circle(x=0.6664952237042414, y=0.33692908734605553, r=0.21174557028487648, level=2, ex={'datum': 0.1}),
+     Circle(x=-0.1128831469183017, y=-0.23039288135707192, r=0.29945345726929773, level=2, ex={'datum': 0.2}),
+     Circle(x=0.1563193680487183, y=0.304601976765483, r=0.29945345726929773, level=2, ex={'datum': 0.2}),
+     Circle(x=0.5533243963620487, y=-0.23039288135707192, r=0.3667540860110527, level=2, ex={'datum': 0.3})]
 
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
@@ -123,3 +123,12 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 *Note* that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
 For instance: circles *a1_1* and *a2* both have a value of 0.05, yet *a1_1* is smaller than *a2* because *a1_1* is fitted within its parent circle *a1* one level below the level of *a2*.
 In other words, the level 1 circles *a1* and *a2* are both proportional to their respective values but *a1_1* is proportional to the values on level 2 witin *a1*.
+
+.. [Huang-2006]
+   WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf
+
+.. [Bostock-2017]
+    Mike Bostock, D3.js, https://beta.observablehq.com/@mbostock/miniball, https://beta.observablehq.com/@mbostock/miniball
+
+.. [MSW-1996]
+   J. Matoušek, M. Sharir, and E. Welzl. A Subexponential Bound For Linear Programming. Algorithmica, 16(4/5):498–516, October/November 1996, http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf
