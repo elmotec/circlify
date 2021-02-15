@@ -23,7 +23,7 @@
 circlify
 ========
 
-Pure Python implementation of circle packing layout algorithm.
+Pure Python implementation of a circle packing layout algorithm, inspired by D3js_ and squarify_.
 
 Circles are first arranged with a euristic inspired by the A1.0 of [Huang-2006]_, then enclosed in a circle created around them using [MSW-1996]_ algorithm used in [Bostock-2017]_.  I hope to implement A1.5 at some point in the future but the results are good enough for my use case.
 
@@ -123,6 +123,10 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 *Note* that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
 For instance: circles *a1_1* and *a2* both have a value of 0.05, yet *a1_1* is smaller than *a2* because *a1_1* is fitted within its parent circle *a1* one level below the level of *a2*.
 In other words, the level 1 circles *a1* and *a2* are both proportional to their respective values but *a1_1* is proportional to the values on level 2 witin *a1*.
+
+.. _d3js: https://observablehq.com/@d3/zoomable-circle-packing
+
+.. _squarify: https://github.com/laserson/squarify
 
 .. [Huang-2006]
    WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf
