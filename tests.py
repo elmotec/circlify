@@ -73,7 +73,7 @@ class SpecialCases(unittest.TestCase):
                 _ = circ.circlify([5e-324, 5e-324, 5e-324])
             except ValueError:
                 pass
-        self.assertIn("too small", context.output[0])
+        self.assertIn("is small", context.output[0])
 
     def test_low_min_max_ratio_warning(self):
         """Low min to max ratio in the data generates should generate a warning."""
@@ -195,6 +195,8 @@ class MultiInstanceTestCase(unittest.TestCase):
             solution = circ.circlify(data)
             actual_d.append(circ.density([c.circle for c in solution]))
             target_d.append(sum(d ** 2.0 for d in data) / target_r ** 2.0)
+        ratios = [a / t for a, t in zip(actual_d, target_d)]
+        self.assertGreater(min(ratios), 0.76)
         self.assertGreater(sum(actual_d), sum(target_d) * 0.83)
 
 
@@ -274,6 +276,15 @@ class HandleDataTestCase(unittest.TestCase):
         self.assertEqual(expected, actual)
 
 
+def ignore_xyr(circles):
+    """Change all x and y to 0.0 and r to 1.0
+
+    This is useful for those tests whose actual (x, y, r) data can change.
+
+    """
+    return [circ.Circle(level=c.level, ex=c.ex) for c in circles]
+
+
 class MultiLevelInputTestCase(DisplayedTestCase):
     """Handles multi-layer input."""
 
@@ -301,26 +312,18 @@ class MultiLevelInputTestCase(DisplayedTestCase):
     def test_json_input(self):
         """Simple json data."""
         actual = circ.circlify(self.data, show_enclosure=True)
+        self.display(actual)
         expected = [
             circ.Circle(x=0.0, y=0.0, r=1.0, level=0, ex=None),
             circ.Circle(
-                x=-0.5658030759977484,
-                y=0.4109778665114514,
-                r=0.18469903125906464,
                 level=1,
                 ex={"datum": 0.05},
             ),
             circ.Circle(
-                x=-0.5658030759977484,
-                y=-0.4109778665114514,
-                r=0.18469903125906464,
                 level=1,
                 ex={"id": "a2", "datum": 0.05},
             ),
             circ.Circle(
-                x=-0.7387961250362587,
-                y=0.0,
-                r=0.2612038749637415,
                 level=1,
                 ex={
                     "id": "a1",
@@ -333,64 +336,40 @@ class MultiLevelInputTestCase(DisplayedTestCase):
                 },
             ),
             circ.Circle(
-                x=0.2612038749637414,
-                y=0.0,
-                r=0.7387961250362586,
                 level=1,
                 ex={"id": "a0", "datum": 0.8, "children": [0.3, 0.2, 0.2, 0.1]},
             ),
             circ.Circle(
-                x=-0.7567888163564135,
-                y=0.1408782365133844,
-                r=0.0616618704777984,
                 level=2,
                 ex={"id": "a1_2", "datum": 0.01},
             ),
             circ.Circle(
-                x=-0.8766762590444033,
-                y=0.0,
-                r=0.1233237409555968,
                 level=2,
                 ex={"datum": 0.04},
             ),
             circ.Circle(
-                x=-0.6154723840806618,
-                y=0.0,
-                r=0.13788013400814464,
                 level=2,
                 ex={"id": "a1_1", "datum": 0.05},
             ),
             circ.Circle(
-                x=0.6664952237042414,
-                y=0.33692908734605553,
-                r=0.21174557028487648,
                 level=2,
                 ex={"datum": 0.1},
             ),
             circ.Circle(
-                x=-0.1128831469183017,
-                y=-0.23039288135707192,
-                r=0.29945345726929773,
                 level=2,
                 ex={"datum": 0.2},
             ),
             circ.Circle(
-                x=0.1563193680487183,
-                y=0.304601976765483,
-                r=0.29945345726929773,
                 level=2,
                 ex={"datum": 0.2},
             ),
             circ.Circle(
-                x=0.5533243963620487,
-                y=-0.23039288135707192,
-                r=0.3667540860110527,
                 level=2,
                 ex={"datum": 0.3},
             ),
         ]
-        self.display(actual)
-        self.assertEqual(expected, actual)
+        actual_level_and_ex = ignore_xyr(actual)
+        self.assertEqual(expected, actual_level_and_ex)
 
     def test_handle_single_value(self):
         """Typical specification of data with just a value."""
@@ -420,42 +399,28 @@ class MultiLevelInputTestCase(DisplayedTestCase):
         actual = circ.circlify([self.data[2]])
         expected = [
             circ.Circle(
-                x=0.0,
-                y=0.0,
-                r=1.0,
                 level=1,
                 ex={"id": "a0", "datum": 0.8, "children": [0.3, 0.2, 0.2, 0.1]},
             ),
             circ.Circle(
-                x=0.5485834792658247,
-                y=0.4560515085667507,
-                r=0.2866089346022009,
                 level=2,
                 ex={"datum": 0.1},
             ),
             circ.Circle(
-                x=-0.5063467568453797,
-                y=-0.3118490657294185,
-                r=0.40532624241173587,
                 level=2,
                 ex={"datum": 0.2},
             ),
             circ.Circle(
-                x=-0.14196677995553322,
-                y=0.41229503843233306,
-                r=0.40532624241173587,
                 level=2,
                 ex={"datum": 0.2},
             ),
             circ.Circle(
-                x=0.39540072220055367,
-                y=-0.3118490657294185,
-                r=0.4964212366341975,
                 level=2,
                 ex={"datum": 0.3},
             ),
         ]
-        self.assertEqual(expected, actual)
+        actual_level_and_ex = ignore_xyr(actual)
+        self.assertEqual(expected, actual_level_and_ex)
 
     def test_missing_datum_value(self):
         """Missing data generates KeyError."""
@@ -533,6 +498,21 @@ class GetIntersectionTestCase(unittest.TestCase):
         c1 = circ.Circle(x=x1, y=y1, r=r1)
         c2 = circ.Circle(x=x2, y=y2, r=r2)
         self.assertIsNotNone(circ.get_intersection(c1, c2))
+
+
+class LookAheadLoopTestCase(unittest.TestCase):
+    """Test look ahead loop."""
+
+    def test_one_look_ahead(self):
+        """Normal case of a look ahead."""
+        actual = list(circ.look_ahead([1, 2, 3]))
+        expected = [(1, 2), (2, 3), (3, None)]
+        self.assertEqual(actual, expected)
+
+    def test_one_look_ahead_with_empty_input(self):
+        """Empty input case of a look ahead."""
+        actual = list(circ.look_ahead([]))
+        self.assertEqual(actual, [])
 
 
 if __name__ == "__main__":

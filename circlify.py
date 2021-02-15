@@ -229,20 +229,6 @@ def get_placement_candidates(radius, c1, c2, margin):
     return candidate1, candidate2
 
 
-def get_hole_degree_euclid(candidate, circles):
-    """Calculate the hole degree of a candidate circle.
-
-    Args:
-        candidate: candidate circle.
-        circles: sequence of circles.
-
-    Returns:
-        Squared euclidian distance of the candidate to the circles in argument.
-
-    """
-    return sum(distance(candidate, c) ** 2.0 for c in circles)
-
-
 def get_hole_degree_radius_w(candidate, circles):
     """Calculate the hole degree of a candidate circle.
 
@@ -257,22 +243,6 @@ def get_hole_degree_radius_w(candidate, circles):
 
     """
     return sum(distance(candidate, c) * c.r for c in circles)
-
-
-def get_hole_degree_euclid_2(candidate, circles):
-    """Calculate the hole degree of a candidate circle.
-
-    Args:
-        candidate: candidate circle.
-        circles: sequence of circles.
-
-    Returns:
-        Squared euclidian distance of the candidate to the furthest 2 circles
-        in argument.
-
-    """
-    closest = sorted(distance(candidate, c) ** 2.0 for c in circles)
-    return sum(closest[-2:])
 
 
 def get_hole_degree_a1_0(candidate, circles):
@@ -293,7 +263,71 @@ def get_hole_degree_a1_0(candidate, circles):
     return min(distance(candidate, c) for c in circles)
 
 
-get_hole_degree = get_hole_degree_radius_w
+def get_hole_degree_density(candidate, circles):
+    """Calculate the hole degree of a candidate circle.
+
+    Args:
+        candidate: candidate circle.
+        circles: sequence of circles.
+
+    Returns:
+        One minus the density of the configuration. So the result should always
+        be between 0 and 1. See also density.
+
+    """
+    return 1.0 - density(circles + [candidate])
+
+
+def place_new_A1_0(radius, next_, const_placed_circles, get_hole_degree):
+    """Place a new circle.
+
+    Args:
+        radius: value to be added.
+        next_: next value to be added after radius.
+        const_placed_circles: circles.
+        get_hole_degree: objective function to maximize.
+
+    Returns:
+        New configuration.
+
+    """
+    placed_circles = const_placed_circles[:]
+    n_circles = len(placed_circles)
+    # If there are 2 or less, place circles on each side of (0, 0)
+    if n_circles <= 1:
+        x = radius if n_circles == 0 else -radius
+        circle = _Circle(x, float(0.0), radius)
+        placed_circles.append(circle)
+        return placed_circles
+    mhd = None
+    lead_candidate = None
+    for (c1, c2) in itertools.combinations(placed_circles, 2):
+        margin = radius * _eps * 10.0
+        # Placed circles other than the 2 circles used to find the
+        # candidate placement.
+        other_circles = [c for c in placed_circles if c not in (c1, c2)]
+        for cand in get_placement_candidates(radius, c1, c2, margin):
+            if cand is None:
+                continue
+            if not other_circles:
+                lead_candidate = cand
+                break
+            # If overlaps with any, skip this candidate.
+            if any(distance(c, cand) < 0.0 for c in other_circles):
+                continue
+            hd = get_hole_degree(cand, other_circles)
+            assert hd is not None, "hole degree should not be None!"
+            # If we were to use next_ we could use it here for look ahead.
+            if mhd is None or hd < mhd:
+                mhd = hd
+                lead_candidate = cand
+            if abs(mhd) < margin:
+                break
+    if lead_candidate is None:
+        # The radius is set to sqrt(value) in pack_A1_0
+        raise ValueError("cannot place circle for value " + str(radius ** 2))
+    placed_circles.append(lead_candidate)
+    return placed_circles
 
 
 def pack_A1_0(data):
@@ -316,41 +350,11 @@ def pack_A1_0(data):
         )
     assert data == sorted(data, reverse=True), "data must be sorted (desc)"
     placed_circles = []
-    for value in data:
-        radius = math.sqrt(value)
-        n_circles = len(placed_circles)
-        # Place first 2 circles on each side of (0, 0)
-        if n_circles <= 1:
-            x = radius if n_circles == 0 else -radius
-            circle = _Circle(x, float(0.0), radius)
-            placed_circles.append(circle)
-            continue
-        mhd = None
-        lead_candidate = None
-        for (c1, c2) in itertools.combinations(placed_circles, 2):
-            margin = float(_eps)
-            # Placed circles other than the 2 circles used to find the
-            # candidate placement.
-            other_circles = [c for c in placed_circles if c not in (c1, c2)]
-            for cand in get_placement_candidates(radius, c1, c2, margin):
-                if cand is None:
-                    continue
-                if not other_circles:
-                    lead_candidate = cand
-                    break
-                # If overlaps with any, skip this candidate.
-                if any(distance(c, cand) < 0.0 for c in other_circles):
-                    continue
-                hd = get_hole_degree(cand, other_circles)
-                assert hd is not None, "hole degree should not be None!"
-                if mhd is None or hd < mhd:
-                    mhd = hd
-                    lead_candidate = cand
-                if abs(mhd) < margin:
-                    break
-        if lead_candidate is None:
-            raise ValueError("cannot place circle for value " + str(value))
-        placed_circles.append(lead_candidate)
+    radiuses = [math.sqrt(value) for value in data]
+    for radius, next_ in look_ahead(radiuses):
+        placed_circles = place_new_A1_0(
+            radius, next_, placed_circles, get_hole_degree_radius_w
+        )
     return placed_circles
 
 
@@ -449,25 +453,6 @@ def encloseBasis3(a, b, c):
     return _Circle(x1 + xa + xb * r, y1 + ya + yb * r, r)
 
 
-def scale(circle, target, enclosure):
-    """Scale circle in enclosure to fit in the target circle.
-
-    Args:
-        circle: Circle to scale.
-        target: target Circle to scale to.
-        enclosure: allows one to specify the enclosure.
-
-    Returns:
-        scaled circle
-
-    """
-    r = target.r / enclosure.r
-    t_x, t_y = target.x, target.y
-    e_x, e_y = enclosure.x, enclosure.y
-    c_x, c_y, c_r = circle
-    return _Circle((c_x - e_x) * r + t_x, (c_y - e_y) * r + t_y, c_r * r)
-
-
 def enclose(circles):
     """Shamelessly adapted from d3js.
 
@@ -491,6 +476,25 @@ def enclose(circles):
     return e
 
 
+def scale(circle, target, enclosure):
+    """Scale circle in enclosure to fit in the target circle.
+
+    Args:
+        circle: Circle to scale.
+        target: target Circle to scale to.
+        enclosure: allows one to specify the enclosure.
+
+    Returns:
+        scaled circle
+
+    """
+    r = target.r / enclosure.r
+    t_x, t_y = target.x, target.y
+    e_x, e_y = enclosure.x, enclosure.y
+    c_x, c_y, c_r = circle
+    return _Circle((c_x - e_x) * r + t_x, (c_y - e_y) * r + t_y, c_r * r)
+
+
 def density(circles, enclosure=None):
     """Computes the relative density of te packed circles.
 
@@ -498,13 +502,25 @@ def density(circles, enclosure=None):
         circles: packed list of circles.
 
     Return:
-        Compute the enclosure and calculates the relative area of the sum of the
-        inner cirlces to the area of the enclosure.
+        Compute the enclosure if not passed as argument and calculates the
+        relative area of the sum of the inner cirlces to the area of the
+        enclosure.
 
     """
     if not enclosure:
         enclosure = enclose(circles)
     return sum(c.r ** 2.0 for c in circles if c != enclosure) / enclosure.r ** 2.0
+
+
+def look_ahead(iterable, n_elems=1):
+    """Fetch look ahead elements of data
+
+    From https://stackoverflow.com/questions/4197805/python-for-loop-look-ahead
+
+    """
+    items, nexts = itertools.tee(iterable, 2)
+    nexts = itertools.islice(nexts, n_elems, None)
+    return itertools.zip_longest(items, nexts)
 
 
 def _handle(data, level, fields=None):
@@ -528,7 +544,7 @@ def _handle(data, level, fields=None):
             raise ValueError("input data must be positive. Found " + str(datum))
         if datum <= _eps:
             log.warning(
-                "input data %f is too small and could generate stability issues. Can you scale the data set up or drop insignificant elements?",
+                "input data %f is small and could cause stability issues. Can you scale the data set up or drop insignificant elements?",
                 datum,
             )
         try:
