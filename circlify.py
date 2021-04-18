@@ -60,10 +60,7 @@ try:  # pragma: no cover
         ax.set_title(title)
         if lim is None:
             lim = max(
-                max(
-                    abs(circle.x) + circle.r,
-                    abs(circle.y) + circle.r,
-                )
+                max(abs(circle.x) + circle.r, abs(circle.y) + circle.r,)
                 for circle in circles
             )
         plt.xlim(-lim, lim)
