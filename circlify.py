@@ -18,7 +18,7 @@ import logging
 import math
 import sys
 
-__version__ = "0.13"
+__version__ = "0.14.0"
 
 
 log = logging.getLogger(__name__)
