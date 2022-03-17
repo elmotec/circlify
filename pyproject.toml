@@ -1,0 +1,6 @@
+[tool]
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.14.0"
+tag_format = "v$version"
+version_files = ["circilfy.py:__version__"]
