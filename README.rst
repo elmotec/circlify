@@ -83,7 +83,7 @@ Example
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
 
-.. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_3.png
+.. figure:: https://github.com/elmotec/circlify/blob/main/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
 
 Starting with version 0.10, circlify also handle hierarchical input so that:
@@ -117,7 +117,7 @@ Starting with version 0.10, circlify also handle hierarchical input so that:
 
 A simple matplotlib representation. See ``circlify.bubbles`` helper function (requires ``matplotlib``):
 
-.. figure:: https://github.com/elmotec/circlify/blob/master/static/Figure_4.png
+.. figure:: https://github.com/elmotec/circlify/blob/main/static/Figure_4.png
    :alt: visualization of circlify nested circle packing for a hierarchical input.
 
 *Note* that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
