@@ -6,17 +6,13 @@
     :target: https://pypi.org/pypi/circlify/
     :alt: Python compatibility
 
-.. image:: https://img.shields.io/travis/elmotec/circlify.svg
-    :target: https://travis-ci.org/elmotec/circlify
-    :alt: Build Status
+.. image:: https://img.shields.io/github/workflow/status/elmotec/circlify/Python%20package/main
+    :target: https://github.com/elmotec/circlify/actions
+    :alt: GitHub Workflow Status (branch)
 
-.. image:: https://coveralls.io/repos/elmotec/circlify/badge.svg
-    :target: https://coveralls.io/r/elmotec/circlify
-    :alt: Coverage
-
-.. image:: https://img.shields.io/codacy/grade/474b0af6853a4c5f8f9214d3220571f9.svg
-    :target: https://www.codacy.com/app/elmotec/circlify/dashboard
-    :alt: Codacy
+.. image:: https://codecov.io/gh/elmotec/circlify/branch/master/graph/badge.svg?token=PSE4TFPGTV 
+    :target: https://codecov.io/gh/elmotec/circlify
+    :alt: Codecov
 
 
 ========
