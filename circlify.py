@@ -23,6 +23,7 @@ __version__ = "0.14.0"
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
+log.addHandler(logging.StreamHandler(sys.stdout))
 
 _eps = sys.float_info.epsilon
 
@@ -523,7 +524,7 @@ def look_ahead(iterable, n_elems=1):
 
 
 def _handle(data, level, fields=None):
-    """Converts possibly heterogeneous list of float or dict in list of Output.
+    """Convert possibly heterogeneous list of float or dict in list of Output.
 
     Return:
         list of list of Output. There is one list per level and the (level
@@ -583,6 +584,10 @@ def _circlify_level(data, target_enclosure, fields, level=1):
             all_circles += _circlify_level(
                 circle.ex[fields.children], circle.circle, fields, level + 1
             )
+        elif __debug__:
+            for key in circle.ex:
+                if key not in [fields.id, fields.datum, fields.children]:
+                    log.warning("unexpected key '%s' in input is ignored", key)
         all_circles.append(circle)
     return all_circles
 
