@@ -2,7 +2,7 @@
 matplotlib
 pyreadline
 pre-commit
-black
+black[d]
 wheel
 hypothesis
 commitizen

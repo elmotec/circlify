@@ -125,7 +125,7 @@ class DensityThresholdTestCase(DisplayedTestCase):
 
     def test_geometric_series(self):
         """Check the coordinates of the circles returned are expected."""
-        data = sorted((2 ** n for n in range(4, 12)), reverse=True)
+        data = sorted((2**n for n in range(4, 12)), reverse=True)
         actual = circ.circlify(data, show_enclosure=True)
         self.display(actual, reversed(data + [None]))
         self.assertGreater(density(actual), self.density_threshold)
@@ -134,11 +134,11 @@ class DensityThresholdTestCase(DisplayedTestCase):
         """Check that many similar circle are packed as expected."""
         pi = 1.0
         data = (
-            [{"id": "2.4", "datum": pi * 2.4 ** 2}] * 1
-            + [{"id": "1.825", "datum": pi * 1.825 ** 2}] * 1
-            + [{"id": "1.55", "datum": pi * 1.55 ** 2}] * 6
-            + [{"id": "1.275", "datum": pi * 1.275 ** 2}] * 8
-            + [{"id": "1.1875", "datum": pi * 1.1875 ** 2}] * 9
+            [{"id": "2.4", "datum": pi * 2.4**2}] * 1
+            + [{"id": "1.825", "datum": pi * 1.825**2}] * 1
+            + [{"id": "1.55", "datum": pi * 1.55**2}] * 6
+            + [{"id": "1.275", "datum": pi * 1.275**2}] * 8
+            + [{"id": "1.1875", "datum": pi * 1.1875**2}] * 9
         )
         actual = circ.circlify(data, show_enclosure=True)
         self.display(actual, range(len(actual)))
@@ -194,7 +194,7 @@ class MultiInstanceTestCase(unittest.TestCase):
             data, target_r = data[:-1], data[-1]
             solution = circ.circlify(data)
             actual_d.append(circ.density([c.circle for c in solution]))
-            target_d.append(sum(d ** 2.0 for d in data) / target_r ** 2.0)
+            target_d.append(sum(d**2.0 for d in data) / target_r**2.0)
         ratios = [a / t for a, t in zip(actual_d, target_d)]
         self.assertGreater(min(ratios), 0.76)
         self.assertGreater(sum(actual_d), sum(target_d) * 0.83)
@@ -293,7 +293,11 @@ class MultiLevelInputTestCase(DisplayedTestCase):
         self.data = [
             0.05,
             {"id": "a2", "datum": 0.05},
-            {"id": "a0", "datum": 0.8, "children": [0.3, 0.2, 0.2, 0.1],},
+            {
+                "id": "a0",
+                "datum": 0.8,
+                "children": [0.3, 0.2, 0.2, 0.1],
+            },
             {
                 "id": "a1",
                 "datum": 0.1,
@@ -311,8 +315,14 @@ class MultiLevelInputTestCase(DisplayedTestCase):
         self.display(actual)
         expected = [
             circ.Circle(x=0.0, y=0.0, r=1.0, level=0, ex=None),
-            circ.Circle(level=1, ex={"datum": 0.05},),
-            circ.Circle(level=1, ex={"id": "a2", "datum": 0.05},),
+            circ.Circle(
+                level=1,
+                ex={"datum": 0.05},
+            ),
+            circ.Circle(
+                level=1,
+                ex={"id": "a2", "datum": 0.05},
+            ),
             circ.Circle(
                 level=1,
                 ex={
@@ -329,13 +339,34 @@ class MultiLevelInputTestCase(DisplayedTestCase):
                 level=1,
                 ex={"id": "a0", "datum": 0.8, "children": [0.3, 0.2, 0.2, 0.1]},
             ),
-            circ.Circle(level=2, ex={"id": "a1_2", "datum": 0.01},),
-            circ.Circle(level=2, ex={"datum": 0.04},),
-            circ.Circle(level=2, ex={"id": "a1_1", "datum": 0.05},),
-            circ.Circle(level=2, ex={"datum": 0.1},),
-            circ.Circle(level=2, ex={"datum": 0.2},),
-            circ.Circle(level=2, ex={"datum": 0.2},),
-            circ.Circle(level=2, ex={"datum": 0.3},),
+            circ.Circle(
+                level=2,
+                ex={"id": "a1_2", "datum": 0.01},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.04},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"id": "a1_1", "datum": 0.05},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.1},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.2},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.2},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.3},
+            ),
         ]
         actual_level_and_ex = ignore_xyr(actual)
         self.assertEqual(expected, actual_level_and_ex)
@@ -371,10 +402,22 @@ class MultiLevelInputTestCase(DisplayedTestCase):
                 level=1,
                 ex={"id": "a0", "datum": 0.8, "children": [0.3, 0.2, 0.2, 0.1]},
             ),
-            circ.Circle(level=2, ex={"datum": 0.1},),
-            circ.Circle(level=2, ex={"datum": 0.2},),
-            circ.Circle(level=2, ex={"datum": 0.2},),
-            circ.Circle(level=2, ex={"datum": 0.3},),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.1},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.2},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.2},
+            ),
+            circ.Circle(
+                level=2,
+                ex={"datum": 0.3},
+            ),
         ]
         actual_level_and_ex = ignore_xyr(actual)
         self.assertEqual(expected, actual_level_and_ex)

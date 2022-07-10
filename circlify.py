@@ -60,7 +60,10 @@ try:  # pragma: no cover
         ax.set_title(title)
         if lim is None:
             lim = max(
-                max(abs(circle.x) + circle.r, abs(circle.y) + circle.r,)
+                max(
+                    abs(circle.x) + circle.r,
+                    abs(circle.y) + circle.r,
+                )
                 for circle in circles
             )
         plt.xlim(-lim, lim)
@@ -71,7 +74,6 @@ try:  # pragma: no cover
         if not labels:
             labels = [get_default_label(i, c) for i, c in enumerate(circles)]
         return _bubbles([c.circle for c in circles], labels, lim)
-
 
 except ImportError:  # pragma: no cover
     pass
@@ -322,7 +324,7 @@ def place_new_A1_0(radius, next_, const_placed_circles, get_hole_degree):
                 break
     if lead_candidate is None:
         # The radius is set to sqrt(value) in pack_A1_0
-        raise ValueError("cannot place circle for value " + str(radius ** 2))
+        raise ValueError("cannot place circle for value " + str(radius**2))
     placed_circles.append(lead_candidate)
     return placed_circles
 
@@ -356,7 +358,7 @@ def pack_A1_0(data):
 
 
 def extendBasis(B, p):
-    """Extend basis to ...  """
+    """Extend basis to ..."""
     if enclosesWeakAll(p, B):
         return [p]
 
@@ -506,7 +508,7 @@ def density(circles, enclosure=None):
     """
     if not enclosure:
         enclosure = enclose(circles)
-    return sum(c.r ** 2.0 for c in circles if c != enclosure) / enclosure.r ** 2.0
+    return sum(c.r**2.0 for c in circles if c != enclosure) / enclosure.r**2.0
 
 
 def look_ahead(iterable, n_elems=1):
