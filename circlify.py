@@ -27,7 +27,7 @@ log.addHandler(logging.NullHandler())
 _eps = sys.float_info.epsilon
 
 
-try:  # pragma: no cover
+try:  # pragma: no cover  # noqa
     import matplotlib.pyplot as plt
 
     def get_default_label(count, circle):
