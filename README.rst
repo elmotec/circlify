@@ -19,7 +19,7 @@
 circlify
 ========
 
-Pure Python implementation of a circle packing layout algorithm, inspired by D3js_ and squarify_.
+Pure Python implementation of a circle packing layout algorithm, inspired by `d3js <https://observablehq.com/@d3/zoomable-circle-packing>`_ and `squarify <https://github.com/laserson/squarify>`_.
 
 Circles are first arranged with a euristic inspired by the A1.0 of [Huang-2006]_, then enclosed in a circle created around them using [MSW-1996]_ algorithm used in [Bostock-2017]_.  I hope to implement A1.5 at some point in the future but the results are good enough for my use case.
 
@@ -57,7 +57,7 @@ The function returns a list of ``circlify.Circle`` whose *area* is proportional 
 
 
 Example
--------
+^^^^^^^
 
 .. code:: python
 
@@ -81,6 +81,9 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 
 .. figure:: https://github.com/elmotec/circlify/blob/main/static/Figure_3.png
    :alt: visualization of circlify circle packing of first 9 prime numbers.
+
+Hierarchical circle packing
+---------------------------
 
 Starting with version 0.10, circlify also handle hierarchical input so that:
 
@@ -116,13 +119,30 @@ A simple matplotlib representation. See ``circlify.bubbles`` helper function (re
 .. figure:: https://github.com/elmotec/circlify/blob/main/static/Figure_4.png
    :alt: visualization of circlify nested circle packing for a hierarchical input.
 
-*Note* that the area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
+Relative size of circles in hierachy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level.
 For instance: circles *a1_1* and *a2* both have a value of 0.05, yet *a1_1* is smaller than *a2* because *a1_1* is fitted within its parent circle *a1* one level below the level of *a2*.
 In other words, the level 1 circles *a1* and *a2* are both proportional to their respective values but *a1_1* is proportional to the values on level 2 witin *a1*.
 
-.. _d3js: https://observablehq.com/@d3/zoomable-circle-packing
+Invalid input
+^^^^^^^^^^^^^
 
-.. _squarify: https://github.com/laserson/squarify
+A warning is issued if a key is not understood.  The check is disabled if the program is running with -O or -OO option.  One can also disable the warning with the `regular logging filters <https://docs.python.org/3/library/logging.html#filter-objects>`_.
+
+For instance:
+
+.. code:: python
+
+    >>> import logging
+    >>> import sys
+    >>> import circlify as circ
+    >>> data = [ 0.05, {'id': 'a2', 'datum': 0.05, "bogus": {}}]
+    >>> logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+    >>> _ = circ.circlify(data)
+    unexpected 'bogus' in input is ignored  # not issued if __debug__ is false
+
 
 .. [Huang-2006]
    WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf

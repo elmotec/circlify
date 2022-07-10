@@ -432,6 +432,28 @@ class MultiLevelInputTestCase(DisplayedTestCase):
         with self.assertRaisesRegex(KeyError, "value"):
             circ.circlify([{"ex": " Missing value"}], datum_field="value")
 
+    @unittest.skipUnless(__debug__, "optimized code: this test runs in debug mode only")
+    def test_warning_when_unknown_key_is_found(self):
+        """Warning is raised when unknown key is found."""
+        with self.assertLogs("circlify", level="WARNING") as warn:
+            _ = circ.circlify([{"datum": 1, "unknown": {}}])
+        self.assertIn("key 'unknown'", warn.output[0])
+
+    @unittest.skipUnless(__debug__, "optimized code: this test runs in debug mode only")
+    def test_warning_when_unknown_key_is_found_2(self):
+        """Warning is raised when unknown key is found."""
+        with self.assertLogs("circlify", level="WARNING") as warn:
+            _ = circ.circlify([0.05, {'id': 'a2', 'datum': 0.05, "bogus": {}}])
+        self.assertIn("key 'bogus'", warn.output[0])
+
+    @unittest.skipIf(
+        __debug__, "non-optimized code: this test runs with -O option only"
+    )
+    def test_no_unknown_key_warning_when_optimized(self):
+        """Warning is raised when unknown key is found."""
+        with self.assertNoLogs("circlify", level="WARNING"):
+            _ = circ.circlify([{"datum": 1, "unknown": {}}])
+
 
 class HedgeTestCase(unittest.TestCase):
     def test_one_big_two_small(self):
