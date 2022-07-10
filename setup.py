@@ -7,6 +7,7 @@ import os
 
 from setuptools import setup
 
+__version__ = "0.15.0"
 here = os.path.abspath(os.path.dirname(__file__))
 readme = open(os.path.join(here, "README.rst")).read()
 
@@ -15,7 +16,7 @@ setup(
     description="Circle packing algorithm for Python",
     long_description=readme,
     long_description_content_type="text/x-rst",
-    version="0.14.0",
+    version=__version__,
     author="Elmotec",
     author_email="elmotec@gmx.com",
     license="MIT",

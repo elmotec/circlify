@@ -3,4 +3,4 @@
 name = "cz_conventional_commits"
 version = "0.15.0"
 tag_format = "v$version"
-version_files = ["circlify.py:__version__"]
+version_files = ["circlify.py:__version__", "setup.py:__version__"]
