@@ -32,8 +32,10 @@ The last step may require `sudo` if you don\'t have root access.
 The main function `circlify` is supported by a small data class `circlify.Circle` and takes 3 parameters:
 
 -   A list of positive values sorted from largest to smallest.
+
 -   (optional) A target enclosure where the packed circles should fit.
     It defaults to the unit circle (0, 0, 1).
+
 -   (optional) A boolean indicating if the target enclosure should be
     appended to the output.
 
@@ -118,16 +120,12 @@ unexpected 'bogus' in input is ignored  # not issued if __debug__ is false
 
 ## References
 
-##### Bostock-2017
-Mike Bostock, D3.js,
-[https://beta.observablehq.com/@mbostock/miniball](https://beta.observablehq.com/@mbostock/miniball)
+### Bostock-2017
+Mike Bostock, D3.js, [https://beta.observablehq.com/@mbostock/miniball](https://beta.observablehq.com/@mbostock/miniball)
 
-##### Huang-2006
-WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container,
-[https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf](https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf)
+### Huang-2006
+WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, [https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf](https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf)
 
-##### MSW-1996
-J. Matoušek, M. Sharir, and E. Welzl. A Subexponential Bound For Linear Programming. Algorithmica, 16(4/5):498--516, October/November 1996,
-[http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf](http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf)
-
+### MSW-1996
+J. Matoušek, M. Sharir, and E. Welzl. A Subexponential Bound For Linear Programming. Algorithmica, 16(4/5):498--516, October/November 1996, [http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf](http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf)
 
