@@ -1,7 +1,7 @@
 [![PyPi version](https://img.shields.io/pypi/v/circlify.svg)](https://pypi.org/pypi/circlify/)
 [![Python compatibility](https://img.shields.io/pypi/pyversions/circlify.svg)](https://pypi.org/pypi/circlify/)
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/elmotec/circlify/Python%20package/main)](https://github.com/elmotec/circlify/actions)
-[![Codecov](https://codecov.io/gh/elmotec/circlify/branch/master/graph/badge.svg?token=PSE4TFPGTV)](https://codecov.io/gh/elmotec/circlify)
+[![codecov](https://codecov.io/gh/elmotec/circlify/branch/main/graph/badge.svg?token=PSE4TFPGTV)](https://codecov.io/gh/elmotec/circlify)
 
 # circlify
 
