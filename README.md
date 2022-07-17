@@ -13,19 +13,19 @@ Circles are first arranged with a euristic inspired by the A1.0 of [\[Huang-2006
 
 Using pip:
 
-``` python
+```python
     pip install circlify
 ```
 
 or using the source:
 
-``` python
+```python
     git clone git://github.com/elmotec/circlify.git
     cd circlify
     python setup.py install
 ```
 
-The last step may require `sudo` if you don\'t have root access.
+The last step may require `sudo` if you don\\'t have root access.
 
 ## Usage
 
@@ -39,11 +39,11 @@ The main function `circlify` is supported by a small data class `circlify.Circle
 -   (optional) A boolean indicating if the target enclosure should be
     appended to the output.
 
-The function returns a list of `circlify.Circle` whose *area* is proportional to the corresponding input value.
+The function returns a list of `circlify.Circle` whose _area_ is proportional to the corresponding input value.
 
 ### Example
 
-``` python
+```python
 >>> from pprint import pprint as pp
 >>> import circlify as circ
 >>> circles = circ.circlify([19, 17, 13, 11, 7, 5, 3, 2, 1], show_enclosure=True)
@@ -68,7 +68,7 @@ A simple matplotlib representation. See `circlify.bubbles` helper function (requ
 
 Starting with version 0.10, circlify also handle hierarchical input so that:
 
-``` python
+```python
 >>> from pprint import pprint as pp
 >>> import circlify as circ
 >>> data = [
@@ -100,7 +100,7 @@ A simple matplotlib representation. See `circlify.bubbles` helper function (requ
 
 ### Relative size of circles in hierachy
 
-The area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level. For instance: circles *a1_1* and *a2* both have a value of 0.05, yet *a1_1* is smaller than *a2* because *a1_1* is fitted within its parent circle *a1* one level below the level of *a2*. In other words, the level 1 circles *a1* and *a2* are both proportional to their respective values but *a1_1* is proportional to the values on level 2 witin *a1*.
+The area of the circles are proportional to the values passed in input only if the circles are at the same hierarchical level. For instance: circles _a1_1_ and _a2_ both have a value of 0.05, yet _a1_1_ is smaller than _a2_ because _a1_1_ is fitted within its parent circle _a1_ one level below the level of _a2_. In other words, the level 1 circles _a1_ and _a2_ are both proportional to their respective values but _a1_1_ is proportional to the values on level 2 witin _a1_.
 
 ### Invalid input
 
@@ -108,7 +108,7 @@ A warning is issued if a key is not understood. The check is disabled if the pro
 
 For instance:
 
-``` python
+```python
 >>> import logging
 >>> import sys
 >>> import circlify as circ
@@ -121,11 +121,13 @@ unexpected 'bogus' in input is ignored  # not issued if __debug__ is false
 ## References
 
 ### Bostock-2017
-Mike Bostock, D3.js, [https://beta.observablehq.com/@mbostock/miniball](https://beta.observablehq.com/@mbostock/miniball)
+
+Mike Bostock, D3.js, <https://beta.observablehq.com/@mbostock/miniball>
 
 ### Huang-2006
-WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, [https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf](https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf)
+
+WenQi HUANG, Yu LI, ChuMin LI, RuChu XU, New Heuristics for Packing Unequal Circles into a Circular Container, <https://home.mis.u-picardie.fr/~cli/Publis/circle.pdf>
 
 ### MSW-1996
-J. Matoušek, M. Sharir, and E. Welzl. A Subexponential Bound For Linear Programming. Algorithmica, 16(4/5):498--516, October/November 1996, [http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf](http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf)
 
+J. Matoušek, M. Sharir, and E. Welzl. A Subexponential Bound For Linear Programming. Algorithmica, 16(4/5):498--516, October/November 1996, <http://www.inf.ethz.ch/personal/emo/PublFiles/SubexLinProg_ALG16_96.pdf>

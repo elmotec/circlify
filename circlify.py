@@ -81,7 +81,7 @@ except ImportError:  # pragma: no cover
 
 
 _Circle = collections.namedtuple("_Circle", ["x", "y", "r"])
-FieldNames = collections.namedtuple("Field", ["id", "datum", "children"])
+Fields = collections.namedtuple("Fields", ["id", "datum", "children"])
 
 
 class Circle:
@@ -532,7 +532,7 @@ def _handle(data, level, fields=None):
 
     """
     if fields is None:
-        fields = FieldNames(None, None, None)
+        fields = Fields(None, None, None)
     datum_field = fields.datum if fields.datum else "datum"
     elements = []
     for datum in data:
@@ -563,7 +563,7 @@ def _circlify_level(data, target_enclosure, fields, level=1):
     Args:
         elements (list of Circle): structured data to be process.
         target_enclosure (Circle): target enclosure to fit the cirlces into.
-        fields (FieldNames): field names.
+        fields (Fields): field names.
         level (int): level of depth in the hierarchy.
 
     Returns:
@@ -630,7 +630,7 @@ def circlify(
         (root to leaf) and descending value (biggest circles first).
 
     """
-    fields = FieldNames(id=id_field, datum=datum_field, children=children_field)
+    fields = Fields(id=id_field, datum=datum_field, children=children_field)
     if target_enclosure is None:
         target_enclosure = Circle(level=0, x=0.0, y=0.0, r=1.0)
     all_circles = _circlify_level(data, target_enclosure, fields)

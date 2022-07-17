@@ -3,7 +3,7 @@ name: Publish to PIPY if tagged
 on:
   push:
     tags:  # only 3 digits releases
-    - 'v[0-9]+.[0-9]+.[0-9]+'
+    - v[0-9]+.[0-9]+.[0-9]+
     - '!v[0-9]+.[0-9]+.[0-9]+-*'
 
 jobs:

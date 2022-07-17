@@ -443,7 +443,7 @@ class MultiLevelInputTestCase(DisplayedTestCase):
     def test_warning_when_unknown_key_is_found_2(self):
         """Warning is raised when unknown key is found."""
         with self.assertLogs("circlify", level="WARNING") as warn:
-            _ = circ.circlify([0.05, {'id': 'a2', 'datum': 0.05, "bogus": {}}])
+            _ = circ.circlify([0.05, {"id": "a2", "datum": 0.05, "bogus": {}}])
         self.assertIn("key 'bogus'", warn.output[0])
 
     @unittest.skipIf(
