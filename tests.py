@@ -85,17 +85,14 @@ class SpecialCases(unittest.TestCase):
         self.assertIn("min to max ratio", context.output[0])
 
 
-class DisplayedTestCase(unittest.TestCase):
-    """Display the result of the placement of the circle."""
-
-    def display(self, circles, labels=None):
-        """Forwards call to circ.circlify.bubbles()."""
-        try:
-            if display_layout:
-                circ.bubbles(circles, labels)
-        except AttributeError as err:
-            print("{}. Did you install matplotlib?".format(err))
-            raise
+def display(circles, labels=None):
+    """Forwards call to circ.circlify.bubbles()."""
+    try:
+        if display_layout:
+            circ.bubbles(circles, labels)
+    except AttributeError as err:
+        print("{}. Did you install matplotlib?".format(err))
+        raise
 
 
 def density(circles):
@@ -103,7 +100,7 @@ def density(circles):
     return circ.density([c.circle for c in circles])
 
 
-class DensityThresholdTestCase(DisplayedTestCase):
+class DensityThresholdTestCase:
     """Simple test cases that checks the density of the circle placement."""
 
     def setUp(self):
@@ -113,21 +110,21 @@ class DensityThresholdTestCase(DisplayedTestCase):
         """Check the coordinates of the circles returned are expected."""
         data = [19, 17, 13, 11, 7, 5, 3, 2, 1]
         actual = circ.circlify(data, show_enclosure=True)
-        self.display(actual, reversed(data + [None]))
+        display(actual, reversed(data + [None]))
         self.assertGreater(density(actual), self.density_threshold)
 
     def test_range_series(self):
         """Check the coordinates of the circles returned are expected."""
         data = list(range(7, 1, -1))
         actual = circ.circlify(data, show_enclosure=True)
-        self.display(actual, reversed(data + [None]))
+        display(actual, reversed(data + [None]))
         self.assertGreater(density(actual), self.density_threshold)
 
     def test_geometric_series(self):
         """Check the coordinates of the circles returned are expected."""
         data = sorted((2**n for n in range(4, 12)), reverse=True)
         actual = circ.circlify(data, show_enclosure=True)
-        self.display(actual, reversed(data + [None]))
+        display(actual, reversed(data + [None]))
         self.assertGreater(density(actual), self.density_threshold)
 
     def test_many_similar_circles(self):
@@ -141,7 +138,7 @@ class DensityThresholdTestCase(DisplayedTestCase):
             + [{"id": "1.1875", "datum": pi * 1.1875**2}] * 9
         )
         actual = circ.circlify(data, show_enclosure=True)
-        self.display(actual, range(len(actual)))
+        display(actual, range(len(actual)))
         self.assertGreater(density(actual), self.density_threshold)
 
 
@@ -190,7 +187,7 @@ class MultiInstanceTestCase(unittest.TestCase):
         }
         # fmt: on
         actual_d, target_d = [], []
-        for (name, data) in instances.items():
+        for (_, data) in instances.items():
             data, target_r = data[:-1], data[-1]
             solution = circ.circlify(data)
             actual_d.append(circ.density([c.circle for c in solution]))
@@ -285,7 +282,7 @@ def ignore_xyr(circles):
     return [circ.Circle(level=c.level, ex=c.ex) for c in circles]
 
 
-class MultiLevelInputTestCase(DisplayedTestCase):
+class MultiLevelInputTestCase:
     """Handles multi-layer input."""
 
     def setUp(self):
@@ -312,7 +309,7 @@ class MultiLevelInputTestCase(DisplayedTestCase):
     def test_json_input(self):
         """Simple json data."""
         actual = circ.circlify(self.data, show_enclosure=True)
-        self.display(actual)
+        display(actual)
         expected = [
             circ.Circle(x=0.0, y=0.0, r=1.0, level=0, ex=None),
             circ.Circle(
