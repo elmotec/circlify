@@ -592,17 +592,6 @@ def _circlify_level(data, target_enclosure, fields, level=1):
     return all_circles
 
 
-def _flatten(elements, flattened):
-    """Flattens the elements hierarchy."""
-    if elements is None:
-        return
-    for elem in elements:
-        _flatten(elem.children, flattened)
-        elem.children = None
-        flattened.append(elem)
-    return flattened
-
-
 def circlify(
     data,
     target_enclosure=None,
