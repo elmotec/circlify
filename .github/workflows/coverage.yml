@@ -28,10 +28,9 @@ jobs:
         python -m coverage run --source=circlify test_circlify.py
         python -m coverage xml
 
-    # upload to codecov
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         fail_ci_if_error: true
-
-
+        files: ./coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
