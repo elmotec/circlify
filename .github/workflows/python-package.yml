@@ -31,4 +31,4 @@ jobs:
         ruff check .
     - name: Test with pytest
       run: |
-        python tests.py -v
+        python test_circlify.py -v

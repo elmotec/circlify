@@ -104,3 +104,5 @@ setup.bat
 
 # IDE files
 .idea/
+.settings/
+.vscode/

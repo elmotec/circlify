@@ -25,7 +25,7 @@ jobs:
     - name: Generate coverage report
       run: |
         python -m coverage erase
-        python -m coverage run --source=circlify tests.py
+        python -m coverage run --source=circlify test_circlify.py
         python -m coverage xml
 
     # upload to codecov
