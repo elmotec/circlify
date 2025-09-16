@@ -1,6 +1,6 @@
 [![PyPi version](https://img.shields.io/pypi/v/circlify.svg)](https://pypi.org/pypi/circlify/)
 [![Python compatibility](https://img.shields.io/pypi/pyversions/circlify.svg)](https://pypi.org/pypi/circlify/)
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/elmotec/circlify/Python%20package/main)](https://github.com/elmotec/circlify/actions)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/elmotec/circlify/python-package.yml)](https://github.com/elmotec/circlify/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/elmotec/circlify/branch/main/graph/badge.svg?token=PSE4TFPGTV)](https://codecov.io/gh/elmotec/circlify)
 
 # circlify
@@ -22,7 +22,7 @@ or using the source:
 ```python
     git clone git://github.com/elmotec/circlify.git
     cd circlify
-    python setup.py install
+    pip install .
 ```
 
 The last step may require `sudo` if you don\\'t have root access.

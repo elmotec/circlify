@@ -1,6 +1,0 @@
--r requirements.txt
-coverage>=5.3
-coveralls>=3.3.1
-# Required for tests
-flake8>=4.0.1
-hypothesis>=6.50.1
