@@ -185,9 +185,7 @@ def get_intersection(circle1, circle2):
                 circle1,
                 circle2,
             )
-        if math.isclose(d, 0, abs_tol=eps) and math.isclose(
-            r1, r2, rel_tol=0.0, abs_tol=eps
-        ):
+        if math.isclose(d, 0, abs_tol=eps) and math.isclose(r1, r2, rel_tol=0.0, abs_tol=eps):
             log.debug("no solution, circles are coincident: %s, %s", circle1, circle2)
         return None, None
     xm = x1 + a * dx / d
@@ -301,7 +299,7 @@ def place_new_A1_0(radius, next_, const_placed_circles, get_hole_degree):
         return placed_circles
     mhd = None
     lead_candidate = None
-    for (c1, c2) in itertools.combinations(placed_circles, 2):
+    for c1, c2 in itertools.combinations(placed_circles, 2):
         margin = radius * _eps * 10.0
         # Placed circles other than the 2 circles used to find the
         # candidate placement.
@@ -345,16 +343,14 @@ def pack_A1_0(data):
     min_max_ratio = min(data) / max(data)
     if min_max_ratio < _eps:
         log.warning(
-            "min to max ratio is too low at %f and it could cause algorithm stability issues. Try to remove insignificant data",
-            min_max_ratio,
+            f"min to max ratio is too low at {min_max_ratio} and it could cause algorithm stability issues. "
+            "Try to remove insignificant data",
         )
     assert data == sorted(data, reverse=True), "data must be sorted (desc)"
     placed_circles = []
     radiuses = [math.sqrt(value) for value in data]
     for radius, next_ in look_ahead(radiuses):
-        placed_circles = place_new_A1_0(
-            radius, next_, placed_circles, get_hole_degree_radius_w
-        )
+        placed_circles = place_new_A1_0(radius, next_, placed_circles, get_hole_degree_radius_w)
     return placed_circles
 
 
@@ -544,13 +540,13 @@ def _handle(data, level, fields=None):
             raise ValueError("input data must be positive. Found " + str(datum))
         if datum <= _eps:
             log.warning(
-                "input data %f is small and could cause stability issues. Can you scale the data set up or drop insignificant elements?",
-                datum,
+                f"input data {datum} is small and could cause stability issues. "
+                "Can you scale the data set up or drop insignificant elements?"
             )
         try:
             elements.append(Circle(r=datum + 0, level=level, ex={"datum": datum}))
-        except TypeError:  # if it fails, assume dict.
-            raise TypeError("dict or numeric value expected")
+        except TypeError as err:  # if it fails, assume dict.
+            raise TypeError("dict or numeric value expected") from err
     return sorted(elements, reverse=True)
 
 
@@ -581,9 +577,7 @@ def _circlify_level(data, target_enclosure, fields, level=1):
         circle.level = level
         circle.circle = scale(inner_circle, target_enclosure, enclosure)
         if circle.ex and fields.children in circle.ex:
-            all_circles += _circlify_level(
-                circle.ex[fields.children], circle.circle, fields, level + 1
-            )
+            all_circles += _circlify_level(circle.ex[fields.children], circle.circle, fields, level + 1)
         elif __debug__:
             for key in circle.ex:
                 if key not in [fields.id, fields.datum, fields.children]:

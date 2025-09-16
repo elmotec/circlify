@@ -5,9 +5,10 @@
 
 import unittest
 
-import circlify as circ
 import hypothesis as h
 import hypothesis.strategies as hst
+
+import circlify as circ
 
 # Set this variable to True to get a display of the layout (req matlplotlib)
 display_layout = False
@@ -18,7 +19,7 @@ class CircleTest(unittest.TestCase):
 
     def test_repr_and_str_with_id_(self):
         """Check str() and repr() conversion"""
-        expected = "Circle(x=0.0, y=0.0, r=2.0, level=1, " "ex={'label': '3'})"
+        expected = "Circle(x=0.0, y=0.0, r=2.0, level=1, ex={'label': '3'})"
         actual = str(circ.Circle(r=2.0, ex={"label": "3"}))
         self.assertEqual(expected, actual)
 
@@ -145,9 +146,7 @@ class DensityThresholdTestCase:
 class MultiInstanceTestCase(unittest.TestCase):
     """Multiple instances test cases."""
 
-    @h.given(
-        hst.lists(hst.floats(min_value=0.1, max_value=100), min_size=3, max_size=30)
-    )
+    @h.given(hst.lists(hst.floats(min_value=0.1, max_value=100), min_size=3, max_size=30))
     def test_hypothesis(self, data):
         actual = circ.circlify(data, show_enclosure=True)
         self.assertGreaterEqual(density(actual), 0.5, str(data))
@@ -187,7 +186,7 @@ class MultiInstanceTestCase(unittest.TestCase):
         }
         # fmt: on
         actual_d, target_d = [], []
-        for (_, data) in instances.items():
+        for _, data in instances.items():
             data, target_r = data[:-1], data[-1]
             solution = circ.circlify(data)
             actual_d.append(circ.density([c.circle for c in solution]))
@@ -443,9 +442,7 @@ class MultiLevelInputTestCase:
             _ = circ.circlify([0.05, {"id": "a2", "datum": 0.05, "bogus": {}}])
         self.assertIn("key 'bogus'", warn.output[0])
 
-    @unittest.skipIf(
-        __debug__, "non-optimized code: this test runs with -O option only"
-    )
+    @unittest.skipIf(__debug__, "non-optimized code: this test runs with -O option only")
     def test_no_unknown_key_warning_when_optimized(self):
         """Warning is raised when unknown key is found."""
         with self.assertNoLogs("circlify", level="WARNING"):
@@ -455,9 +452,7 @@ class MultiLevelInputTestCase:
 class HedgeTestCase(unittest.TestCase):
     def test_one_big_two_small(self):
         """Makes sure we get 3 circles in t"""
-        actual = circ.circlify(
-            [0.998997995991984, 0.000501002004008016, 0.000501002004008016]
-        )
+        actual = circ.circlify([0.998997995991984, 0.000501002004008016, 0.000501002004008016])
         self.assertEqual(3, len(actual))
 
 
@@ -471,12 +466,8 @@ class GetIntersectionTestCase(unittest.TestCase):
         possible DomainError raised by the sqrt of negative number.
 
         """
-        c1 = circ._Circle(
-            x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889
-        )
-        c2 = circ._Circle(
-            x=0.029345054623395653, y=0.06025929883988402, r=2.220446049250313e-15
-        )
+        c1 = circ._Circle(x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889)
+        c2 = circ._Circle(x=0.029345054623395653, y=0.06025929883988402, r=2.220446049250313e-15)
         self.assertEqual(circ.get_intersection(c1, c2), (None, None))
 
     def test_small_circle_that_does_intersect(self):
@@ -486,9 +477,7 @@ class GetIntersectionTestCase(unittest.TestCase):
         that can be computed.
 
         """
-        c1 = circ._Circle(
-            x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889
-        )
+        c1 = circ._Circle(x=-0.005574001032652584, y=0.10484176298731643, r=0.05662982038967889)
         c2 = circ._Circle(x=0.029345054623395653, y=0.06025929883988402, r=1.0e-09)
         self.assertEqual(
             circ.get_intersection(c1, c2),
