@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "circlify"
-version = "0.15.0"
+version = "0.15.1"
 description = "Circle packing algorithm for Python"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {text = "MIT"}
@@ -81,6 +81,6 @@ ignore = []
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.15.0"
+version = "0.15.1"
 tag_format = "v$version"
 version_files = ["circlify.py:__version__", "pyproject.toml:version"]
