@@ -27,7 +27,7 @@ make install
 
 Run `make help` to see the available commands. `make lint`, `make test`, and `make coverage` use the locked environment. `make test-all` runs the tests on each supported Python version; uv downloads missing interpreters as needed. The supported versions come from the Python classifiers in `pyproject.toml`; update those classifiers to change the local test list and CI versions. On Windows, use the equivalent `uv sync --locked` and `uv run --locked python -m unittest -v` commands.
 
-For dependency updates, edit `pyproject.toml` and run `uv lock`, or run `make upgrade` to refresh all locked dependencies and pre-commit hooks. Commit `pyproject.toml` and `uv.lock` together. `make dist` builds the package, and `make release` bumps the version and updates the changelog.
+For dependency updates, edit `pyproject.toml` and run `uv lock`, or run `make upgrade` to refresh all locked dependencies and pre-commit hooks. Commit `pyproject.toml` and `uv.lock` together. `make dist` builds the package. `make release` defaults to a minor version bump, updates the changelog and lockfile, and creates the release commit and tag. Use `make release RELEASE_INCREMENT=PATCH` or `make release RELEASE_INCREMENT=MAJOR` for a different bump.
 
 ## Usage
 

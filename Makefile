@@ -39,7 +39,7 @@ upgrade: ## Upgrade locked dependencies and pre-commit hooks
 	uv run --locked pre-commit autoupdate
 
 release: ## Bump the version and update the changelog
-	uv run --locked cz bump --changelog --retry
+	uv run --locked cz bump --changelog --retry ${RELEASE_OPTIONS}
 
 clean: ## Remove generated build, test, and coverage files
 	rm -rf build dist htmlcov .pytest_cache .coverage coverage.xml
