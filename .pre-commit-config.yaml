@@ -6,7 +6,7 @@ repos:
     stages:
     - commit-msg
   repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.9.1
+  rev: v4.19.3
 - hooks:
   - id: check-added-large-files
     exclude: ^uv\.lock$
@@ -23,13 +23,13 @@ repos:
     - '2'
     id: pretty-format-yaml
   repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.15.0
+  rev: v2.16.0
 - hooks:
   - id: ruff
     args: [--fix]
   - id: ruff-format
   repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.13.0
+  rev: v0.17.3
 - hooks:
   - args:
     - --install-types
@@ -38,7 +38,7 @@ repos:
     files: circlify.py
     id: mypy
   repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.18.1
+  rev: v2.4.1
 - hooks:
   - id: tests
     entry: uv run --locked python -m unittest
