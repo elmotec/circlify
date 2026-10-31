@@ -13,10 +13,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
+    - name: Read latest supported Python version
+      id: supported
+      run: echo "latest=$(python3 scripts/supported_pythons.py --latest)" >> "$GITHUB_OUTPUT"
     - name: Set up Python
       uses: actions/setup-python@v7
       with:
-        python-version: '3.14'
+        python-version: ${{ steps.supported.outputs.latest }}
     - uses: astral-sh/setup-uv@v10.3.3
     - name: Sync dependencies
       run: uv sync --locked

@@ -6,13 +6,26 @@ on:
   pull_request:
 
 jobs:
-  build:
+  versions:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.supported.outputs.matrix }}
+      latest: ${{ steps.supported.outputs.latest }}
+    steps:
+    - uses: actions/checkout@v7
+    - name: Read supported Python versions
+      id: supported
+      run: |
+        echo "matrix=$(python3 scripts/supported_pythons.py --json)" >> "$GITHUB_OUTPUT"
+        echo "latest=$(python3 scripts/supported_pythons.py --latest)" >> "$GITHUB_OUTPUT"
 
+  build:
+    needs: versions
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12', '3.13', '3.14']
+        python-version: ${{ fromJSON(needs.versions.outputs.matrix) }}
 
     steps:
     - uses: actions/checkout@v7
@@ -30,12 +43,13 @@ jobs:
       run: make test
 
   windows:
+    needs: versions
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v7
     - uses: actions/setup-python@v7
       with:
-        python-version: '3.14'
+        python-version: ${{ needs.versions.outputs.latest }}
     - uses: astral-sh/setup-uv@v10.3.3
     - name: Sync dependencies
       run: uv sync --locked

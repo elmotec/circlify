@@ -2,7 +2,7 @@
 
 .PHONY: help install lint format test test-all coverage dist upgrade release clean
 
-PYTHON_VERSIONS := 3.11 3.12 3.13 3.14
+PYTHON_VERSIONS = $(shell python3 scripts/supported_pythons.py)
 
 help: ## Show available targets
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "%-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
