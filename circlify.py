@@ -48,7 +48,7 @@ try:  # pragma: no cover  # noqa
         if not labels:
             labels = range(len(circles))
         _, ax = plt.subplots(figsize=(8.0, 8.0))
-        for circle, label in zip(circles, labels):
+        for circle, label in zip(circles, labels, strict=False):
             x, y, r = circle
             ax.add_patch(plt.Circle((x, y), r, alpha=0.2, linewidth=2, fill=False))
             ax.text(x, y, label)
@@ -573,7 +573,7 @@ def _circlify_level(data, target_enclosure, fields, level=1):
     packed = pack_A1_0([circle.r for circle in circles])
     enclosure = enclose(packed)
     assert enclosure is not None
-    for circle, inner_circle in zip(circles, packed):
+    for circle, inner_circle in zip(circles, packed, strict=False):
         circle.level = level
         circle.circle = scale(inner_circle, target_enclosure, enclosure)
         if circle.ex and fields.children in circle.ex:

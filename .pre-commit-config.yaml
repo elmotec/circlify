@@ -9,10 +9,11 @@ repos:
   rev: v4.9.1
 - hooks:
   - id: check-added-large-files
+    exclude: ^uv\.lock$
   - id: check-merge-conflict
+  - id: check-toml
   - id: debug-statements
   - id: detect-private-key
-  - id: requirements-txt-fixer
   repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
 - hooks:
@@ -40,14 +41,14 @@ repos:
   rev: v1.18.1
 - hooks:
   - id: tests
-    entry: python -m unittest
+    entry: uv run --locked python -m unittest
     language: system
     name: tests
     pass_filenames: false
-  repo: local
-- hooks:
   - id: remark
-    args: [--output, --frail]     # list of args for remark
+    name: remark
+    entry: remark --output --frail
+    language: node
+    types: [markdown]
     additional_dependencies: [remark-cli@8.0.1, remark-preset-lint-recommended@4.0.1]
-  repo: https://github.com/MaratFM/pre-commit-remark
-  rev: 1.0.0
+  repo: local

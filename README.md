@@ -11,21 +11,23 @@ Circles are first arranged with a euristic inspired by the A1.0 of [\[Huang-2006
 
 ## Installation
 
-Using pip:
+Install the published package with pip:
 
-```python
-    pip install circlify
+```sh
+pip install circlify
 ```
 
-or using the source:
+To work from source, install [uv](https://docs.astral.sh/uv/getting-started/installation/) and sync the development environment:
 
-```python
-    git clone git://github.com/elmotec/circlify.git
-    cd circlify
-    pip install .
+```sh
+git clone https://github.com/elmotec/circlify.git
+cd circlify
+make install
 ```
 
-The last step may require `sudo` if you don\\'t have root access.
+Run `make help` to see the available commands. `make lint`, `make test`, and `make coverage` use the locked environment. `make test-all` runs the tests on each supported Python version; uv downloads missing interpreters as needed. On Windows, use the equivalent `uv sync --locked` and `uv run --locked python -m unittest -v` commands.
+
+For dependency updates, edit `pyproject.toml` and run `uv lock`, or run `make upgrade` to refresh all locked dependencies and pre-commit hooks. Commit `pyproject.toml` and `uv.lock` together. `make dist` builds the package, and `make release` bumps the version and updates the changelog.
 
 ## Usage
 

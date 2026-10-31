@@ -16,36 +16,32 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development",
     "Topic :: Utilities",
     "Topic :: Scientific/Engineering :: Visualization",
     "Intended Audience :: Developers",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
-test = [
-    "coverage>=5.3",
-    "coveralls>=3.3.1",
-    "ruff>=0.1.0",
-    "hypothesis>=6.50.1",
+plot = ["matplotlib>=3.5.2"]
+
+[dependency-groups]
+dev = [
+    "commitizen",
+    "coverage",
+    "hypothesis",
+    "pre-commit",
+    "ruff",
 ]
-develop = [
-    "coverage>=5.3",
-    "coveralls>=3.3.1",
-    "ruff>=0.1.0",
-    "hypothesis>=6.50.1",
-    "commitizen>=2.28.0",
-    "matplotlib>=3.5.2",
-    "pre-commit>=2.19.0",
-    "wheel>=0.37.1",
-]
+
+[tool.uv]
+exclude-newer = "7 days"
 
 [project.urls]
 Homepage = "http://github.com/elmotec/circlify"
@@ -61,7 +57,7 @@ include = ["circlify*"]
 universal = false
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py311"
 line-length = 120
 exclude = ["docs"]
 
@@ -83,4 +79,5 @@ ignore = []
 name = "cz_conventional_commits"
 version = "0.15.1"
 tag_format = "v$version"
+changelog_incremental = true
 version_files = ["circlify.py:__version__", "pyproject.toml:version"]

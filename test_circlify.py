@@ -191,7 +191,7 @@ class MultiInstanceTestCase(unittest.TestCase):
             solution = circ.circlify(data)
             actual_d.append(circ.density([c.circle for c in solution]))
             target_d.append(sum(d**2.0 for d in data) / target_r**2.0)
-        ratios = [a / t for a, t in zip(actual_d, target_d)]
+        ratios = [a / t for a, t in zip(actual_d, target_d, strict=False)]
         self.assertGreater(min(ratios), 0.76)
         self.assertGreater(sum(actual_d), sum(target_d) * 0.83)
 
